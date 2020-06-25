@@ -5,7 +5,7 @@
  * @property string type
  */
 class UnitType extends Base {
-    public static $tablename = 'unitType';
+    public static $tablename = 'unit_type';
 
     public static $_FIELDS = [
         'title',

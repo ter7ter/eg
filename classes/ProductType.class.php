@@ -6,7 +6,7 @@
  * @property float weight
  */
 class ProductType extends Base {
-    public static $tablename = 'productType';
+    public static $tablename = 'product_type';
 
     public static $_FIELDS = [
         'title',

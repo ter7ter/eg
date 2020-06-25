@@ -32,7 +32,7 @@ class Product extends Base {
 
     /**
      * @param $id
-     * @return Unit|bool
+     * @return Product|bool
      * @throws Exception
      */
     public static function get($id)
@@ -70,6 +70,27 @@ class Product extends Base {
         );
         $product->amount = $amount;
         $this->amount -= $amount;
+    }
+
+    /**
+     * @param Product $product
+     * @return bool
+     */
+    public function union($product) {
+        if ($product->type !== $this->type) {
+            return false;
+        }
+        $quality = ($this->amount*$this->quality + $product->amount*$product->quality)/($this->amount + $product->amount);
+        $this->quality = $quality;
+        $this->amount += $product->amount;
+        $this->save();
+        $product->delete();
+        return true;
+    }
+
+    public function add($amount, $quality) {
+        $this->quality = ($this->amount*$this->quality + $amount*$quality)/($this->amount + $amount);
+        $this->amount += $amount;
     }
 
     /**

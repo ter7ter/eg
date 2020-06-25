@@ -13,3 +13,8 @@ require_once("classes/Region.class.php");
 require_once("classes/City.class.php");
 require_once("classes/Currency.class.php");
 require_once("classes/Company.class.php");
+require_once("classes/UnitType.class.php");
+require_once("classes/Unit.class.php");
+require_once("classes/ProductType.class.php");
+require_once("classes/Product.class.php");
+require_once("classes/Transport.class.php");

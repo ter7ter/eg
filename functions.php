@@ -13,6 +13,9 @@ function array_min(array $array) {
     }
     return $min;
 }
+function array_avg(array $array) {
+    return array_sum($array)/count($array);
+}
 function mb_ucfirst(string $string) {
     return mb_strtoupper(mb_substr($string, 0, 1)).mb_substr($string, 1);
 }
@@ -24,7 +27,6 @@ function trim_text(string $text, int $length) {
     }
 }
 function format_timestamp($date, $time = false) {
-    $date += 60*60*3;
     $day = date('d.m.Y', $date);
     if ($day == date('d.m.Y')) {
         $day = 'Сегодня';
@@ -36,6 +38,9 @@ function format_timestamp($date, $time = false) {
     } else {
         return $day;
     }
+}
+function timestamp_to_db($time) {
+    date('Y-m-d H:i:s', $time);
 }
 function format_date($date, $time = false) {
     $date = strtotime($date);
