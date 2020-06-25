@@ -1,0 +1,233 @@
+#admin-menu {
+    width: 98%;
+    min-height: 40px;
+    padding: 10px 1%;
+    background-color: aliceblue;
+}
+.admin-menu-item {
+    float: left;
+    padding: 9px 5px;
+    border-width: 1px;
+    border-style: dotted;
+    margin-left: 2px;
+}
+.admin-menu-item:hover {
+    background-color: beige;
+}
+.data-rows-table {
+    width: 98%;
+    padding: 10px;
+    margin: 12px;
+}
+.data-row {
+    border-width: 1px;
+    border-style: dashed;
+    display: inline-block;
+    width: 100%;
+    margin-top: 3px;
+}
+.data-row-header {
+    border-width: 2px;
+    border-style: solid;
+}
+.data-row-cell input[type=text], .data-row-cell select {
+    width: 100%;
+    text-align: center;
+}
+.data-row-cell {
+    border-width: 1px;
+    border-left-style: solid;
+    padding: 1px;
+    text-align: center;
+    float: left;
+}
+.data-row-cell a {
+    color: blue;
+}
+/**
+Страница категорий
+ */
+.category-id-cell {
+    width: 5%;
+    border-left-style: none;
+}
+.category-icon-cell {
+    width: 15%;
+}
+.category-title-cell {
+    width: 50%;
+}
+.category-action-cell {
+    width: 29%;
+}
+/**
+Страница стран
+ */
+.country-id-cell {
+    width: 14%;
+    border-left-style: none;
+}
+.country-title-cell {
+    width: 50%;
+}
+.country-action-cell {
+    width: 35%;
+}
+/**
+Страница регионов
+ */
+.region-id-cell {
+    width: 14%;
+    border-left-style: none;
+}
+.region-title-cell {
+    width: 30%;
+}
+.region-country-cell {
+    width: 30%;
+}
+.region-action-cell {
+    width: 25%;
+}
+/**
+Страница городов
+ */
+.city-id-cell {
+    width: 14%;
+    border-left-style: none;
+}
+.city-title-cell {
+    width: 22%;
+}
+.city-country-cell {
+    width: 21%;
+}
+.city-region-cell {
+    width: 21%;
+}
+.city-action-cell {
+    width: 20%;
+}
+/**
+Страница пользователей
+ */
+.user-id-cell {
+    width: 5%;
+    border-left-style: none;
+}
+.user-login-cell {
+    width: 12%;
+}
+.user-name-cell {
+    width: 14%;
+}
+.user-type-cell {
+    width: 12%;
+}
+.user-status-cell {
+    width: 12%;
+}
+.user-money-cell {
+    width: 8%;
+}
+.user-activ-cell {
+    width: 12%;
+}
+.user-action-cell {
+    width: 23%;
+}
+/**
+Страница секций форума
+ */
+.forum-section-id-cell {
+    width: 3%;
+    border-left-style: none;
+}
+.forum-section-title-cell {
+    width: 30%;
+}
+.forum-section-description-cell {
+    width: 42%;
+}
+.forum-section-description-cell textarea {
+    width: 100%;
+    height: 33px;
+}
+.forum-section-action-cell {
+    width: 24%;
+}
+/**
+Страница разделов форума
+ */
+.forum-branch-id-cell {
+    width: 4%;
+    border-left-style: none;
+}
+.forum-branch-icon-cell {
+    width: 14%;
+    border-left-style: none;
+}
+.forum-branch-title-cell {
+    width: 30%;
+}
+.forum-branch-section-cell {
+    width: 30%;
+}
+.forum-branch-action-cell {
+    width: 20%;
+}
+/**
+Страница групп форума
+ */
+.forum-group-id-cell {
+    width: 8%;
+    border-left-style: none;
+}
+.forum-group-title-cell {
+    width: 60%;
+}
+.forum-group-action-cell {
+    width: 30%;
+}
+/**
+Страница просмотра логов
+ */
+.log-user-cell {
+    width: 15%;
+    border-left-style: none;
+}
+.log-status-cell {
+    width: 20%;
+}
+.log-message-cell {
+    width: 54%;
+    text-align: left;
+}
+.log-date-cell {
+    width: 10%;
+}
+.data-row-header .log-message-cell {
+    text-align: center;
+}
+/**
+Страница обратной связи
+ */
+.feedback-user-cell {
+    width: 18%;
+    border-left-style: none;
+}
+.feedback-title-cell {
+    width: 60%;
+}
+.feedback-date-cell {
+    width: 10%;
+}
+.feedback-action-cell {
+    width: 10%;
+}
+.feedback-unread {
+    font-weight: bold;
+}
+.stat-info {
+    margin-left: 30px;
+}
