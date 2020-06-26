@@ -40,4 +40,9 @@ class City extends Base {
         $this->regionId = $this->region->id;
         parent::save();
     }
+
+    public function get_info() {
+        $result = $this->get_fields(['id', 'title']);
+        return $result;
+    }
 }

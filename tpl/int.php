@@ -11,6 +11,13 @@
 </head>
 <body>
     <div id="navbar">
+        <?if (isset($data['companyList']) && count($data['companyList'])):?>
+        <div id="header-select-company">
+        <?if (count($data['companyList']) == 1):?>
+        <div class="company-name">Компания "<?=$data['openedCompany']['title']?>"</div>
+        <?endif;?>
+        </div>
+        <?endif;?>
         <ul>
             <li>
                 <a href="/messages">Сообщения</a>

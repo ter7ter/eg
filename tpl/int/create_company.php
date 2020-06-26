@@ -15,7 +15,7 @@
         <form action="/create_company" method="post">
             <input type="hidden" name="action" value="create">
             <div class="data-line">Название компании<br>
-                <input type="text" name="title" placeholder="Введите название компании" minlength="<?=COMPANY_TITLE_MIN?>" maxlength="<?=COMPANY_TITLE_MAX?>" pattern="[a-zA-Z0-9а-яА-Я _-]+">
+                <input type="text" name="title" placeholder="Введите название компании" minlength="<?=COMPANY_TITLE_MIN?>" maxlength="<?=COMPANY_TITLE_MAX?>" pattern="[a-zA-Z0-9а-яА-ЯёЁ _-]+">
             </div>
             <div class="data-line">Валюта компании<br>
                 <select class="show-tooltip" name="currencyId" title="От выбранной валюты будет зависеть в каких странах вы можете открывать предприятия">

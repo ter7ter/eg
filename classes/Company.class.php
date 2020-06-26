@@ -76,14 +76,20 @@ class Company extends Base {
 
     public function get_info($owner = false) {
         if ($owner) {
-            $data = $this->get_fields(['title', 'money']);
+            $result = $this->get_fields(['id', 'title', 'money']);
         } else {
-            $data = $this->get_fields(['title']);
+            $result = $this->get_fields(['id', 'title']);
         }
-        $data['currency'] = $this->currency->get_info();
-        $data['user'] = $this->user->get_info();
+        $result['currency'] = $this->currency->get_info();
+        $result['user'] = $this->user->get_info();
+        return $result;
     }
 
+    /**
+     * @param bool|string $type
+     * @return Unit[]
+     * @throws Exception
+     */
     public function get_units($type = false) {
         $query = "SELECT unit.id FROM unit";
         if (isset(UnitType::$_TYPES[$type])) {

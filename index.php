@@ -44,6 +44,9 @@ if (!isset($_REQUEST['json'])) {
         'refer' => (isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '')]);
 }
 $nextPage = false;
+if ($user) {
+    include "userInit.php";
+}
 do {
     if ($nextPage) {
         $page = $nextPage;

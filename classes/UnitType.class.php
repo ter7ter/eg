@@ -7,6 +7,8 @@
 class UnitType extends Base {
     public static $tablename = 'unit_type';
 
+    public static $_all = [];
+
     public static $_FIELDS = [
         'title',
         'type',
@@ -44,5 +46,10 @@ class UnitType extends Base {
 
     public function save() {
         parent::save();
+    }
+
+    public function get_info() {
+        $result = $this->get_fields(['id', 'title', 'type']);
+        return $result;
     }
 }

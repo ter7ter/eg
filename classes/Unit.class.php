@@ -10,6 +10,8 @@
 class Unit extends Base {
     public static $tablename = 'unit';
 
+    public static $_all = [];
+
     public static $_FIELDS = [
         'title',
         'companyId',
@@ -145,5 +147,9 @@ class Unit extends Base {
         }
     }
 
-
+    public function get_info($owner = false) {
+        $result = $this->get_fields(['id', 'title']);
+        $result['type'] = $this->type->get_info();
+        return $result;
+    }
 }

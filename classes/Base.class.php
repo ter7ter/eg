@@ -138,6 +138,17 @@ class Base
         return $result;
     }
 
+    public static function get_list_info(array $filter = [], array $order = [], $start = false, $limit =  false, $join = '')
+    {
+        $classname = get_called_class();
+        $list = $classname::get_list($filter, $order, $start, $limit, $join);
+        $result = [];
+        foreach ($list as $row) {
+            $result[] = $row->get_info();
+        }
+        return $result;
+    }
+
     public function get_fields($fields) {
         $result = [];
         foreach ($fields as $field) {
@@ -163,15 +174,19 @@ class Base
             $fieldName = $data['name'];
             if (@$data['required'] && (!isset($this->$field) || !$this->$field)) {
                 $errors[] = 'Вы не ввели '.$fieldName;
+                continue;
             }
             if (@$data['minLength'] && mb_strlen($this->$field) < $data['minLength']) {
                 $errors[] =  "Значение '{$fieldName}' должно быть не короче {$data['minLength']} символов'";
+                continue;
             }
             if (@$data['maxLength'] && mb_strlen($this->$field) > $data['maxLength']) {
                 $errors[] =  "Значение '{$fieldName}' должно быть не длинее {$data['maxLength']} символов'";
+                continue;
             }
             if (@$data['pattern'] && !preg_match($data['pattern'], $this->$field)) {
                 $errors[] =  "Недопустимое значение '{$fieldName}'";
+                continue;
             }
         }
         if (count($errors) == 0) {

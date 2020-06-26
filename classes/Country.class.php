@@ -44,4 +44,10 @@ class Country extends Base {
     public function get_regions() {
         return Region::get_list(['countryId' => $this->id]);
     }
+
+    public function get_info() {
+        $result = $this->get_fields(['id', 'title']);
+        $result['currency'] = $this->currency->get_info();
+        return $result;
+    }
 }

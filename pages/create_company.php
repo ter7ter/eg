@@ -3,9 +3,7 @@
  * @var $user User
  */
 $data['currencyList'] = [];
-foreach (Currency::get_list() as $currency) {
-    $data['currencyList'][] = $currency->get_info();
-}
+$data['currencyList'] = Currency::get_list_info();
 $data['money'] = $user->money;
 $action = $_REQUEST['action'] ?? false;
 switch ($action) {

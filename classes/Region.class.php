@@ -49,4 +49,9 @@ class Region extends Base {
         $this->countryId = $this->country->id;
         parent::save();
     }
+
+    public function get_info() {
+        $result = $this->get_fields(['id', 'title']);
+        return $result;
+    }
 }

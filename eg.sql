@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Июн 25 2020 г., 17:31
+-- Время создания: Июн 26 2020 г., 17:22
 -- Версия сервера: 5.7.23
 -- Версия PHP: 7.2.10
 
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`userId`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `log`
@@ -186,7 +186,9 @@ INSERT INTO `log` (`id`, `type`, `userId`, `message`, `params`, `date`) VALUES
 (42, 'user_login', 1, 'Залогинился', NULL, '2020-06-25 16:57:09'),
 (43, 'user_login', 1, 'Залогинился', NULL, '2020-06-25 17:11:36'),
 (44, 'user_login', 1, 'Залогинился', NULL, '2020-06-25 17:11:57'),
-(45, 'user_login', 1, 'Залогинился', NULL, '2020-06-25 17:12:15');
+(45, 'user_login', 1, 'Залогинился', NULL, '2020-06-25 17:12:15'),
+(46, 'user_login', 1, 'Залогинился', NULL, '2020-06-26 14:13:29'),
+(48, 'user_login', 1, 'Залогинился', NULL, '2020-06-26 15:16:09');
 
 -- --------------------------------------------------------
 
@@ -219,6 +221,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   `amount` float NOT NULL,
   `quality` float NOT NULL,
   `unitId` int(10) UNSIGNED DEFAULT NULL,
+  `sellFactor` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `typeId` (`typeId`),
   KEY `unitId` (`unitId`)
@@ -283,9 +286,11 @@ CREATE TABLE IF NOT EXISTS `product_demand` (
   `cityId` int(10) UNSIGNED NOT NULL,
   `productType` int(10) UNSIGNED NOT NULL,
   `baseCount` int(10) UNSIGNED NOT NULL,
+  `remCount` float NOT NULL DEFAULT '0',
   `deficitCount` int(10) UNSIGNED NOT NULL DEFAULT '0',
   `amount` float UNSIGNED NOT NULL,
-  KEY `cityId` (`cityId`),
+  `lastUpdate` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`cityId`,`productType`),
   KEY `productType` (`productType`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -293,9 +298,27 @@ CREATE TABLE IF NOT EXISTS `product_demand` (
 -- Дамп данных таблицы `product_demand`
 --
 
-INSERT INTO `product_demand` (`cityId`, `productType`, `baseCount`, `deficitCount`, `amount`) VALUES
-(1, 3, 500, 0, 1500000),
-(3, 3, 300, 0, 800000);
+INSERT INTO `product_demand` (`cityId`, `productType`, `baseCount`, `remCount`, `deficitCount`, `amount`, `lastUpdate`) VALUES
+(1, 3, 500, 0, 0, 1500000, '2020-06-26 15:28:09'),
+(3, 3, 300, 0, 0, 800000, '2020-06-26 15:28:09');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `product_sell`
+--
+
+DROP TABLE IF EXISTS `product_sell`;
+CREATE TABLE IF NOT EXISTS `product_sell` (
+  `unitId` int(10) UNSIGNED NOT NULL,
+  `typeId` int(10) UNSIGNED NOT NULL,
+  `cityId` int(10) UNSIGNED NOT NULL,
+  `price` float NOT NULL,
+  `shopFactor` float NOT NULL,
+  PRIMARY KEY (`unitId`,`typeId`),
+  KEY `cityId` (`cityId`),
+  KEY `productId` (`typeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -383,7 +406,15 @@ CREATE TABLE IF NOT EXISTS `unit` (
   KEY `companyId` (`companyId`),
   KEY `cityId` (`cityId`),
   KEY `typeId` (`typeId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `unit`
+--
+
+INSERT INTO `unit` (`id`, `title`, `companyId`, `cityId`, `typeId`, `lastUpdate`) VALUES
+(2, 'Первый магазин', 1, 1, 5, '2020-06-26 16:56:55'),
+(3, 'Ларёк', 1, 1, 4, '2020-06-26 17:19:27');
 
 -- --------------------------------------------------------
 
@@ -397,7 +428,7 @@ CREATE TABLE IF NOT EXISTS `unit_type` (
   `title` varchar(50) NOT NULL,
   `type` enum('shop','factory','farm','storage','mine') NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `unit_type`
@@ -406,7 +437,9 @@ CREATE TABLE IF NOT EXISTS `unit_type` (
 INSERT INTO `unit_type` (`id`, `title`, `type`) VALUES
 (1, 'Нефтяная вышка', 'mine'),
 (2, 'Нефтеперерабатывающий завод', 'factory'),
-(3, 'Завод автомобильных шин', 'factory');
+(3, 'Завод автомобильных шин', 'factory'),
+(4, 'Ларёк', 'shop'),
+(5, 'Магазин', 'shop');
 
 -- --------------------------------------------------------
 
@@ -449,7 +482,7 @@ CREATE TABLE IF NOT EXISTS `visit` (
   `refer` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `user_id` (`userId`)
-) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=210 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `visit`
@@ -582,7 +615,80 @@ INSERT INTO `visit` (`id`, `date`, `page`, `userId`, `refer`) VALUES
 (128, '2020-06-25 20:27:47', 'units', 1, 'http://eg.game/login'),
 (129, '2020-06-25 20:29:40', 'units', 1, 'http://eg.game/login'),
 (130, '2020-06-25 20:29:41', 'units', 1, 'http://eg.game/login'),
-(131, '2020-06-25 20:30:44', 'units', 1, 'http://eg.game/login');
+(131, '2020-06-25 20:30:44', 'units', 1, 'http://eg.game/login'),
+(132, '2020-06-26 17:13:21', 'index', NULL, ''),
+(133, '2020-06-26 17:13:22', 'login', NULL, 'http://eg.game/'),
+(134, '2020-06-26 17:13:29', 'login', NULL, 'http://eg.game/login'),
+(135, '2020-06-26 17:13:37', 'main', 1, ''),
+(136, '2020-06-26 17:13:48', 'main', 1, 'http://eg.game/main'),
+(137, '2020-06-26 17:13:50', 'units', 1, 'http://eg.game/main'),
+(138, '2020-06-26 17:30:33', 'units', 1, 'http://eg.game/main'),
+(139, '2020-06-26 17:30:45', 'units', 1, 'http://eg.game/main'),
+(140, '2020-06-26 17:31:08', 'units', 1, 'http://eg.game/main'),
+(141, '2020-06-26 17:31:27', 'units', 1, 'http://eg.game/main'),
+(142, '2020-06-26 17:31:39', 'units', 1, 'http://eg.game/main'),
+(143, '2020-06-26 17:31:44', 'units', 1, 'http://eg.game/main'),
+(144, '2020-06-26 17:31:54', 'units', 1, 'http://eg.game/main'),
+(145, '2020-06-26 17:32:06', 'units', 1, 'http://eg.game/main'),
+(146, '2020-06-26 17:32:20', 'units', 1, 'http://eg.game/main'),
+(147, '2020-06-26 17:32:39', 'units', 1, 'http://eg.game/main'),
+(148, '2020-06-26 17:33:08', 'units', 1, 'http://eg.game/main'),
+(149, '2020-06-26 17:33:56', 'units', 1, 'http://eg.game/main'),
+(150, '2020-06-26 17:33:57', 'units', 1, 'http://eg.game/main'),
+(151, '2020-06-26 17:39:07', 'units', 1, 'http://eg.game/main'),
+(152, '2020-06-26 18:15:42', 'login', NULL, 'http://eg.game/main'),
+(153, '2020-06-26 18:15:47', 'login', NULL, 'http://eg.game/units'),
+(155, '2020-06-26 18:16:09', 'login', 1, 'http://eg.game/login'),
+(156, '2020-06-26 18:16:11', 'units', 1, 'http://eg.game/login'),
+(157, '2020-06-26 18:32:54', 'create_unit', 1, 'http://eg.game/units'),
+(159, '2020-06-26 18:44:19', 'create_unit', 1, 'http://eg.game/units'),
+(161, '2020-06-26 18:53:52', 'create_unit', 1, 'http://eg.game/units'),
+(162, '2020-06-26 19:01:52', 'create_unit', 1, 'http://eg.game/units'),
+(163, '2020-06-26 19:04:05', 'create_unit', 1, 'http://eg.game/units'),
+(164, '2020-06-26 19:05:02', 'create_unit', 1, 'http://eg.game/units'),
+(165, '2020-06-26 19:05:04', 'create_unit', 1, 'http://eg.game/units'),
+(166, '2020-06-26 19:06:34', 'create_unit', 1, 'http://eg.game/units'),
+(167, '2020-06-26 19:10:28', 'create_unit', 1, 'http://eg.game/units'),
+(168, '2020-06-26 19:12:49', 'create_unit', 1, 'http://eg.game/units'),
+(169, '2020-06-26 19:12:50', 'get_cities', 1, 'http://eg.game/create_unit?type=shop'),
+(170, '2020-06-26 19:13:01', 'get_cities', 1, ''),
+(171, '2020-06-26 19:13:36', 'get_cities', 1, ''),
+(172, '2020-06-26 19:13:43', 'get_cities', 1, ''),
+(173, '2020-06-26 19:13:51', 'get_cities', 1, ''),
+(174, '2020-06-26 19:14:48', 'get_cities', 1, ''),
+(175, '2020-06-26 19:18:59', 'get_cities', 1, ''),
+(176, '2020-06-26 19:19:10', 'get_cities', 1, ''),
+(177, '2020-06-26 19:19:15', 'get_cities', 1, ''),
+(178, '2020-06-26 19:19:40', 'get_cities', 1, ''),
+(179, '2020-06-26 19:23:44', 'get_cities', 1, ''),
+(180, '2020-06-26 19:24:15', 'get_cities', 1, ''),
+(181, '2020-06-26 19:24:42', 'create_unit', 1, 'http://eg.game/units'),
+(182, '2020-06-26 19:28:14', 'create_unit', 1, 'http://eg.game/units'),
+(183, '2020-06-26 19:28:43', 'create_unit', 1, 'http://eg.game/units'),
+(184, '2020-06-26 19:51:54', 'create_company', 1, 'http://eg.game/create_unit?type=shop'),
+(185, '2020-06-26 19:51:57', 'create_unit', 1, 'http://eg.game/units'),
+(186, '2020-06-26 19:52:06', 'create_unit', 1, 'http://eg.game/units'),
+(187, '2020-06-26 19:52:08', 'create_unit', 1, 'http://eg.game/create_unit?type=shop'),
+(188, '2020-06-26 19:52:09', 'create_unit', 1, 'http://eg.game/create_unit'),
+(189, '2020-06-26 19:53:25', 'create_unit', 1, 'http://eg.game/create_unit'),
+(190, '2020-06-26 19:54:01', 'create_unit', 1, 'http://eg.game/create_unit'),
+(193, '2020-06-26 19:56:55', 'create_unit', 1, 'http://eg.game/create_unit'),
+(194, '2020-06-26 19:56:55', 'units', 1, 'http://eg.game/create_unit'),
+(195, '2020-06-26 20:01:28', 'units', 1, 'http://eg.game/create_unit'),
+(196, '2020-06-26 20:01:49', 'units', 1, 'http://eg.game/create_unit'),
+(197, '2020-06-26 20:03:20', 'units', 1, 'http://eg.game/create_unit'),
+(198, '2020-06-26 20:05:56', 'units', 1, 'http://eg.game/create_unit'),
+(199, '2020-06-26 20:15:46', 'units', 1, 'http://eg.game/create_unit'),
+(200, '2020-06-26 20:15:46', 'units', 1, 'http://eg.game/create_unit'),
+(201, '2020-06-26 20:15:48', 'create_unit', 1, 'http://eg.game/units'),
+(202, '2020-06-26 20:17:38', 'create_unit', 1, 'http://eg.game/units'),
+(203, '2020-06-26 20:18:55', 'units', 1, 'http://eg.game/create_unit?type=shop'),
+(204, '2020-06-26 20:18:58', 'units', 1, 'http://eg.game/units'),
+(205, '2020-06-26 20:18:59', 'create_unit', 1, 'http://eg.game/units'),
+(206, '2020-06-26 20:19:25', 'create_unit', 1, 'http://eg.game/units'),
+(207, '2020-06-26 20:19:27', 'create_unit', 1, 'http://eg.game/create_unit?type=shop'),
+(208, '2020-06-26 20:19:27', 'units', 1, 'http://eg.game/create_unit?type=shop'),
+(209, '2020-06-26 20:20:44', 'units', 1, 'http://eg.game/create_unit?type=shop');
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -640,6 +746,13 @@ ALTER TABLE `production_making`
 ALTER TABLE `product_demand`
   ADD CONSTRAINT `product_demand_ibfk_1` FOREIGN KEY (`cityId`) REFERENCES `city` (`id`),
   ADD CONSTRAINT `product_demand_ibfk_2` FOREIGN KEY (`productType`) REFERENCES `product_type` (`id`);
+
+--
+-- Ограничения внешнего ключа таблицы `product_sell`
+--
+ALTER TABLE `product_sell`
+  ADD CONSTRAINT `product_sell_ibfk_1` FOREIGN KEY (`cityId`) REFERENCES `city` (`id`),
+  ADD CONSTRAINT `product_sell_ibfk_3` FOREIGN KEY (`unitId`) REFERENCES `unit` (`id`);
 
 --
 -- Ограничения внешнего ключа таблицы `region`

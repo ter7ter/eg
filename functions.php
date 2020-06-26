@@ -33,7 +33,7 @@ function format_timestamp($date, $time = false) {
     }
 }
 function timestamp_to_db($time) {
-    date('Y-m-d H:i:s', $time);
+    return date('Y-m-d H:i:s', $time);
 }
 function format_date($date, $time = false) {
     $date = strtotime($date);

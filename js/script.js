@@ -13,6 +13,33 @@ function create_company_page() {
     $('select[name=currencyId]').change();
 }
 
+function create_unit_page() {
+    $('#unit-select-country').change(function () {
+        $.getJSON('/get_regions&json=1&id=' + $('#unit-select-country').val(), function (response) {
+            if (response.status == 'ok') {
+                $('#unit-select-city').empty();
+                for (var i in response.data.regions) {
+                    $('#unit-select-region').append('<option value="'+response.data.regions[i].id+'">'+response.data.regions[i].title+'</option>')
+                }
+            } else {
+                window.alert('Ошибка: ' + response.error);
+            }
+        })
+    });
+    $('#unit-select-region').change(function () {
+        $.getJSON('/get_cities&json=1&id=' + $('#unit-select-region').val(), function (response) {
+            if (response.status == 'ok') {
+                $('#unit-select-city').empty();
+                for (var i in response.data.cities) {
+                    $('#unit-select-city').append('<option value="'+response.data.cities[i].id+'">'+response.data.cities[i].title+'</option>')
+                }
+            } else {
+                window.alert('Ошибка: ' + response.error);
+            }
+        })
+    });
+}
+
 $(document).on('click', '.delete-confirm', function (e) {
     if (!window.confirm('Вы уверены что хотите удалить?')) {
         e.preventDefault();
@@ -40,5 +67,8 @@ $(document).ready(function (e) {
     $('.show-tooltip').tooltip();
     if ($('#create-company-form').length) {
         create_company_page();
+    }
+    if ($('#create-unit-form').length) {
+        create_unit_page();
     }
 });
