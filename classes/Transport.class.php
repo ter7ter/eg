@@ -8,7 +8,7 @@ class Transport
      * @param Unit $unitTo
      * @return int
      */
-    public static function tranport_time($unitFrom, $unitTo) {
+    public static function transport_time($unitFrom, $unitTo) {
         if ($unitFrom->city === $unitTo->city) {
             $result = 10*60;
         } elseif ($unitFrom->city->region === $unitTo->city->region) {
@@ -23,7 +23,7 @@ class Transport
     }
 
     public static function add($product, $unitFrom, $unitTo) {
-        $time = Transport::tranport_time($unitFrom, $unitTo);
+        $time = Transport::transport_time($unitFrom, $unitTo);
         MyDB::insert('transport',
             ['productId' => $product->id,
             'unitFrom' => $unitFrom->id,

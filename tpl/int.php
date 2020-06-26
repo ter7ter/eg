@@ -13,7 +13,19 @@
     <div id="navbar">
         <ul>
             <li>
+                <a href="/messages">Сообщения</a>
+            </li>
+            <li>
+                <a href="/account">Личный кабинет</a>
+            </li>
+            <li>
+                <a href="/map">Карта</a>
+            </li>
+            <li>
                 <a href="/main">Компания</a>
+            </li>
+            <li>
+                <a href="/units">Предприятия</a>
             </li>
             <li>
                 <a href="/logout">Выход</a>

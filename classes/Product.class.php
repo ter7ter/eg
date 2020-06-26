@@ -73,6 +73,7 @@ class Product extends Base {
     }
 
     /**
+     * Объеденить с другим продуктом
      * @param Product $product
      * @return bool
      */
@@ -88,9 +89,41 @@ class Product extends Base {
         return true;
     }
 
+    /**
+     * Добавить количество
+     * @param $amount
+     * @param $quality
+     */
     public function add($amount, $quality) {
         $this->quality = ($this->amount*$this->quality + $amount*$quality)/($this->amount + $amount);
         $this->amount += $amount;
+    }
+
+    /**
+     * Осуществить продажу в магазине
+     * !!Не сохраняет баланс компании, предпологается сохранить познее
+     * @param int $amount
+     * @param float $price
+     * @return int
+     */
+    public function sell($amount, $price) {
+        if ($this->type->type != 'final') {
+            return 0;
+        }
+        if (!$this->unit || $this->unit->type != 'shop') {
+            return 0;
+        }
+        if ($this->amount < $amount) {
+            $amount = $this->amount;
+        }
+        $this->amount -= $amount;
+        $this->unit->company->money += $price*$amount;
+        if ($this->amount == 0) {
+            $this->delete();
+        } else {
+            $this->save();
+        }
+        return $amount;
     }
 
     /**

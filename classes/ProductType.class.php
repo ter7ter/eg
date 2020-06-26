@@ -4,6 +4,7 @@
  * @property string title
  * @property string type
  * @property float weight
+ * @property float elasticity
  */
 class ProductType extends Base {
     public static $tablename = 'product_type';

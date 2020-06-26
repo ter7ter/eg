@@ -64,6 +64,9 @@ class Unit extends Base {
         parent::save();
     }
 
+    /**
+     * @return Product[]
+     */
     public function get_products() {
         $list = Product::get_list(['unitId' => $this->id]);
         $result = [];
@@ -125,8 +128,22 @@ class Unit extends Base {
             }
             $this->lastUpdate = timestamp_to_db(time());
             $this->save();
-        } elseif ($this->type->type == 'shop') {
-
         }
     }
+
+    public function calculateShopFactor() {
+        if ($this->type->type != 'shop') {
+            return false;
+        }
+        $sells = MyDB::query("SELECT product.id, product.quality, 
+            product_sell.typeId, product_sell.shopFactor, product_sell.price FROM product_sell
+            INNER JOIN product ON product.typeId = product_sell.typeId AND product.unitId = product_sell.unitId
+            WHERE product_sell.unitId = ?id AND price > 0 AND product.amount >= 1", ['id' => $this->id]);
+        foreach ($sells as $sell) {
+            $factor = $sell['quality']/$sell['price'];
+            MyDB::update('product_sell', ['shopFactor' => $factor], " unitId = {$this->id} AND typeId = {$sell['typeId']}");
+        }
+    }
+
+
 }

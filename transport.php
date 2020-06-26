@@ -16,5 +16,6 @@ foreach ($data as $row) {
         $transportProduct->unit = $unit;
         $transportProduct->save();
     }
+    $unit->calculateShopFactor();
     MyDB::end_transaction();
 }

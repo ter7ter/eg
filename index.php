@@ -23,7 +23,6 @@ if (!file_exists("pages/{$page}.php")) {
     die();
 }
 $pageNoLogin = ['index', 'login', 'register', 'captcha', 'help', 'feedback', 'rules'];
-$pageInternal = ['main', 'create_company'];
 $pageExternal = ['index', 'login', 'register', 'help', 'feedback', 'rules'];
 $data = [];
 
@@ -69,9 +68,7 @@ if (!$endPage) {
         print json_encode($response);
     } elseif (in_array($page, $pageExternal)) {
         include "tpl/ext.php";
-    } elseif (in_array($page, $pageInternal)) {
+    } else {
         include "tpl/int.php";
-    } elseif (file_exists("tpl/{$page}.php")) {
-        include "tpl/{$page}.php";
     }
 }

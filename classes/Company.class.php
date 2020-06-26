@@ -83,4 +83,21 @@ class Company extends Base {
         $data['currency'] = $this->currency->get_info();
         $data['user'] = $this->user->get_info();
     }
+
+    public function get_units($type = false) {
+        $query = "SELECT unit.id FROM unit";
+        if (isset(UnitType::$_TYPES[$type])) {
+            $query .= ' INNER JOIN unitType ON unitType.id = unit.typeId';
+        }
+        $query .= ' WHERE unit.companyId = ?cid';
+        if (isset(UnitType::$_TYPES[$type])) {
+            $query .= ' AND unitType.type = ?type';
+        }
+        $rows = MyDB::query($query, ['cid' => $this->id, 'type' => $type]);
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] = Unit::get($row['id']);
+        }
+        return $result;
+    }
 }

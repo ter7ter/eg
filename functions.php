@@ -6,13 +6,6 @@ function inc_value(array &$array, $key, $inc) {
         $array[$key] = $inc;
     }
 }
-function array_min(array $array) {
-    $min = array_pop($array);
-    foreach ($array as $val) {
-        if ($val < $min) $min = $val;
-    }
-    return $min;
-}
 function array_avg(array $array) {
     return array_sum($array)/count($array);
 }
