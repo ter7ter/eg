@@ -24,6 +24,7 @@ switch ($action) {
         if ($unit->validate($errors)) {
             $unit->save();
             header("Location: /units");
+            $endPage = true;
         } else {
             $data['errors'] = $errors;
         }

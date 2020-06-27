@@ -30,6 +30,6 @@ $unitTypes = [
     <?else:?>
     У вас пока нет <?=$unitType['title2']?>
     <?endif;?>
-    <a class="link-button" href="/create_unit?type=<?=$type?>">Создать</a>
+    <a class="link-button" href="/create_unit&type=<?=$type?>">Создать</a>
 </div>
 <?endforeach;?>

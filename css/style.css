@@ -24,6 +24,7 @@ h1 {
 }
 h3 {
 	text-align: center;
+	margin: 0.5em 0;
 }
 .msg-error {
 	color: red;
@@ -48,6 +49,29 @@ h3 {
 }
 .data-form input[type=button], .data-form input[type=submit] {
 	width: 15em;
+}
+.form-tabs {
+	display: inline-block;
+	width: 100%;
+	background-color: #9eb8df;
+	padding: 0 5px;
+}
+.form-tabs .tab {
+	display: inline-block;
+	float: left;
+	padding: 5px 15px;
+	border-width: 1px;
+	border-style: solid;
+	border-bottom-style: none;
+	margin-left: 3px;
+	margin-top: 0.5em;
+	font-size: 14pt;
+}
+.form-tabs .tab.active {
+	background-color: #7e98bf;
+}
+.form-tabs .tab a {
+	color: #120e33;
 }
 .data-line {
 	padding: 10px 0;
@@ -139,4 +163,61 @@ h3 {
 	padding: 7px 15px;
 	min-width: 15em;
 	text-align: center;
+}
+/**
+Страница предприятия
+ */
+#unit-form {
+	padding: 5px 1em;
+	width: 80em;
+	margin-left: calc(50% - 40em);
+	display: inline-block;
+}
+.products-table {
+	width: 100%;
+}
+.products-table tr {
+
+}
+.products-table th {
+	background-color: #9eb8df;
+	padding: 2px 0;
+}
+.products-table td {
+	background-color: #d6d6e0;
+	padding: 2px 0;
+}
+.products-table input[type=text], .data-form input[type=number],.data-form input[type=password], .data-form select {
+	width: 10em;
+}
+/**
+Форма добавления поставки
+ */
+.add-supply-form {
+	box-shadow: 1px 1px 2px 1px grey;
+	width: calc(65em + 40px);
+	background-color: #eeeeee;
+	border-radius: 10px;
+	position: absolute;
+	margin-left: -55em;
+	margin-top: -0.5em;
+	padding: 10px 10px;
+}
+.add-supply-title {
+	text-align: center;
+	font-weight: bold;
+	color: #0c183a;
+}
+.category-item {
+	display: inline-block;
+	border-width: 1px;
+	border-style: dashed;
+	padding: 5px 7px;
+	min-width: 13em;
+	text-align: center;
+	margin: 3px 0px;
+	cursor: pointer;
+}
+.category-item:hover {
+	background-color: #bfbfce;
 }

@@ -10,6 +10,7 @@ if (isset($_POST['login']) && isset($_POST['password'])) {
     if ($user) {
         $_SESSION['uid'] = $user->id;
         $_SESSION['last_activ'] = time();
+        include "userInit.php";
         $nextPage = 'main';
     } else {
         $error = 'Неверный логин или пароль';

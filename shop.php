@@ -10,9 +10,9 @@ foreach ($productDemand as $demand) {
     $remCount = $needSellCount - floor($needSellCount);
     $needSellCount = floor($needSellCount); //Будем продавать только целое количество, остаток запишем на следующий раз
     $sellBudget = $needSellCount*$mPrice; //Бюджет на эти покупки у жителей
-    $sells = MyDB::query("SELECT product.id, product_sell.unitId, product_sell.shopFactor, product_sell.price FROM product_sell
-            INNER JOIN product ON product.typeId = product_sell.typeId AND product.unitId = product_sell.unitId
-            WHERE product_sell.typeId = ?type AND product_sell.cityId = ?cid AND price > 0 AND product.amount >= 1
+    $sells = MyDB::query("SELECT product.id, product_shop.unitId, product_shop.shopFactor, product_shop.price FROM product_shop
+            INNER JOIN product ON product.typeId = product_shop.typeId AND product.unitId = product_shop.unitId
+            WHERE product_shop.typeId = ?type AND product_shop.cityId = ?cid AND price > 0 AND product.amount >= 1
             ORDER BY RAND()",
             ['typeId' => $demand['productType'], 'cityId' => $demand['cityId']]);
     $factorSum = 0;

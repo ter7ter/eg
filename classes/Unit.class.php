@@ -78,6 +78,12 @@ class Unit extends Base {
         return $result;
     }
 
+    public function get_product_sells() {
+        return MyDB::query("SELECT product_sale.typeId, product_sale.price, product_sale.access FROM product_sale 
+            INNER JOIN product ON product.typeId = product_sale.typeId AND product.unitId = product_sale.unitId
+            WHERE product_sale.unitId = ?id", ['id' => $this->id]);
+    }
+
     /**
      * @param ProductType $type
      * @return Product|bool
@@ -90,6 +96,30 @@ class Unit extends Base {
         } else {
             return false;
         }
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function get_transport_to() {
+        $trasport = MyDB::query("SELECT transport.id, transport.unitFrom as unitId, transport.startTime, transport.endTime, 
+            product.amount, product.quality, product.typeId FROM transport 
+            INNER JOIN product ON product.id = transport.productId
+            WHERE unitTo = ?id", ['id' => $this->id]);
+        return $trasport;
+    }
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function get_transport_from() {
+        $trasport = MyDB::query("SELECT transport.id, transport.unitFrom as unitId, transport.startTime, transport.endTime, 
+            product.amount, product.quality, product.typeId FROM transport 
+            INNER JOIN product ON product.id = transport.productId
+            WHERE unitFrom = ?id", ['id' => $this->id]);
+        return $trasport;
     }
 
     public function calculate() {
@@ -138,12 +168,12 @@ class Unit extends Base {
             return false;
         }
         $sells = MyDB::query("SELECT product.id, product.quality, 
-            product_sell.typeId, product_sell.shopFactor, product_sell.price FROM product_sell
-            INNER JOIN product ON product.typeId = product_sell.typeId AND product.unitId = product_sell.unitId
-            WHERE product_sell.unitId = ?id AND price > 0 AND product.amount >= 1", ['id' => $this->id]);
+            product_shop.typeId, product_shop.shopFactor, product_shop.price FROM product_shop
+            INNER JOIN product ON product.typeId = product_shop.typeId AND product.unitId = product_shop.unitId
+            WHERE product_shop.unitId = ?id AND price > 0 AND product.amount >= 1", ['id' => $this->id]);
         foreach ($sells as $sell) {
             $factor = $sell['quality']/$sell['price'];
-            MyDB::update('product_sell', ['shopFactor' => $factor], " unitId = {$this->id} AND typeId = {$sell['typeId']}");
+            MyDB::update('product_shop', ['shopFactor' => $factor], " unitId = {$this->id} AND typeId = {$sell['typeId']}");
         }
     }
 
@@ -151,5 +181,15 @@ class Unit extends Base {
         $result = $this->get_fields(['id', 'title']);
         $result['type'] = $this->type->get_info();
         return $result;
+    }
+
+    public function update_sell_price($typeId, $price, $access) {
+        $price = floatval($price);
+        if (!in_array($access, ['all', 'private', 'list', 'close'])) {
+            $access = 'close';
+        }
+        MyDB::query("INSERT INTO product_sale SET unitId = ?unit_id, typeId = ?type_id, price = '?price', access = '?access'
+            ON DUPLICATE KEY UPDATE price = '?price', access = '?access'",
+            ['unit_id' => $this->id, 'type_id' => $typeId, 'price' => $price, 'access' => $access]);
     }
 }

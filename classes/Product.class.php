@@ -7,7 +7,9 @@
  * @property int unitId
  */
 class Product extends Base {
-    public static $tablename = 'unit';
+    public static $tablename = 'product';
+
+    public static $_all = [];
 
     public static $_FIELDS = [
         'typeId',
@@ -146,5 +148,11 @@ class Product extends Base {
         $product->save();
         Transport::add($product, $unitFrom, $unitTo);
         return true;
+    }
+
+    public function get_info() {
+        $result = $this->get_fields(['id', 'amount', 'quality']);
+        $result['type'] = $this->type->get_info();
+        return $result;
     }
 }

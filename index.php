@@ -36,6 +36,7 @@ if ($user && !is_null($user->block) && !in_array($page, ['logout', 'feedback', '
 $error = false;
 $errors = [];
 $endPage = false;
+$outPage = false;
 $data = [];
 if (!isset($_REQUEST['json'])) {
     MyDB::insert("visit",
@@ -69,6 +70,8 @@ if (!$endPage) {
                 'data' => $data];
         }
         print json_encode($response);
+    } elseif ($outPage) {
+        include "tpl/out/{$page}.php";
     } elseif (in_array($page, $pageExternal)) {
         include "tpl/ext.php";
     } else {

@@ -38,6 +38,29 @@ function create_unit_page() {
             }
         })
     });
+    $('input[name=title]').change(function () {
+        $(this).attr('data-changed', 1);
+    });
+    $('#unit-select-type').change(function () {
+        if ($('input[name=title]').attr('data-changed') == '0') {
+            $('input[name=title]').val($('#unit-select-type :selected').text());
+        }
+    });
+}
+
+function unit_page() {
+    $('.do-add-supply').click(function () {
+        var td = $(this).closest('td');
+        var line = $(this).closest('tr');
+        $.get('/add_supply', function (data) {
+            td.append('<tr><td colspan="4">'+data+'</td></tr>');
+        });
+    });
+    $('.category-item').click(function () {
+        $.post('/add_supply', {'step': 2, 'category_id': $(this).attr('data-id') }, function (data) {
+            td.append('<tr><td colspan="4">'+data+'</td></tr>');
+        });
+    });
 }
 
 $(document).on('click', '.delete-confirm', function (e) {
@@ -70,5 +93,8 @@ $(document).ready(function (e) {
     }
     if ($('#create-unit-form').length) {
         create_unit_page();
+    }
+    if ($('#unit-form').length) {
+        unit_page();
     }
 });

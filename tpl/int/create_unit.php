@@ -42,7 +42,7 @@
             </select>
         </div>
         <div class="data-line">Название<br>
-            <input type="text" name="title" placeholder="Введите название предприятия" minlength="<?=UNIT_TITLE_MIN?>" maxlength="<?=UNIT_TITLE_MAX?>" pattern="[a-zA-Z0-9а-яА-ЯёЁ _-]+" value="<?=@$data['title']?>">
+            <input type="text" name="title" placeholder="Введите название предприятия" minlength="<?=UNIT_TITLE_MIN?>" maxlength="<?=UNIT_TITLE_MAX?>" data-changed="0" pattern="[a-zA-Z0-9а-яА-ЯёЁ _-]+" value="<?=@$data['title']?>">
         </div>
         <div class="data-line"><input type="submit" value="Создать"></div>
     </form>
