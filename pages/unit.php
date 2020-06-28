@@ -39,7 +39,7 @@ if ($unit) {
         }
         foreach ($transport as $item) {
             $typeId = $item['typeId'];
-            if (isset($data['products'])) {
+            if (isset($data['products'][$typeId])) {
                 $data['products'][$typeId]['transport'][] = $item;
             } else {
                 $data['products'][$typeId] = [

@@ -188,8 +188,57 @@ class Unit extends Base {
         if (!in_array($access, ['all', 'private', 'list', 'close'])) {
             $access = 'close';
         }
-        MyDB::query("INSERT INTO product_sale SET unitId = ?unit_id, typeId = ?type_id, price = '?price', access = '?access'
-            ON DUPLICATE KEY UPDATE price = '?price', access = '?access'",
-            ['unit_id' => $this->id, 'type_id' => $typeId, 'price' => $price, 'access' => $access]);
+        MyDB::query("INSERT INTO product_sale 
+            SET unitId = ?unit_id, typeId = ?type_id, price = '?price', access = '?access', currencyId = ?currency_id
+            ON DUPLICATE KEY UPDATE price = '?price', access = '?access', currencyId = ?currency_id",
+            ['unit_id' => $this->id, 'type_id' => $typeId, 'currency_id' => $this->company->currency->id, 'price' => $price, 'access' => $access]);
+    }
+
+    private static function supply_query() {
+        $query = "FROM product_sale
+            INNER JOIN product on product.typeId = product_sale.typeId AND product.unitId = product_sale.unitId
+            INNER JOIN unit ON unit.id = product_sale.unitId
+            WHERE (product_sale.access = 'all' OR (product_sale.access = 'private' AND unit.companyId = ?company_id))
+            AND product_sale.typeId = ?type_id AND product.amount >=1 AND product_sale.currencyId = ?currency_id
+            AND product_sale.unitId != ?unit_id";
+        return $query;
+    }
+
+    /**
+     * @param ProductType $productType
+     * @param array $order
+     * @param int $start
+     * @param bool|int $limit
+     * @return array
+     * @throws Exception
+     */
+    public function get_supply_list($productType, $order = [], $start = 0, $limit = false) {
+        $query = "SELECT product_sale.price, product_sale.access, product_sale.unitId, product.amount, product.quality ".Unit::supply_query();
+        if (count($order)) {
+            $orderField = array_key_first($order);
+            $orderDirection = $order[$orderField];
+        } else {
+            $orderField = 'price';
+            $orderDirection = 'DESC';
+        }
+
+        $query .= " ORDER BY ?order ?direction";
+        if ($limit) {
+            $query .= " LIMIT ?start, ?limit";
+        }
+        $list = MyDB::query($query,
+            ['company_id' => $this->company->id, 'type_id' => $productType->id, 'currency_id' => $this->company->currency->id,
+            'unit_id' => $this->id, 'order' => $orderField, 'direction' => $orderDirection, 'start' => $start, 'limit' => $limit]);
+        return $list;
+    }
+
+    /**
+     * @param ProductType $productType
+     * @return int
+     * @throws Exception
+     */
+    public function get_supply_list_count($productType) {
+        $query = "SELECT count(*) ".Unit::supply_query();
+        return MyDB::query($query, ['company_id' => $this->company->id, 'type_id' => $productType->id, 'currency_id' => $this->company->currency->id, 'unit_id' => $this->id], 'elem');
     }
 }

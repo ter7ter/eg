@@ -138,6 +138,9 @@ h3 {
 	font-size: 18pt;
 	margin-top: 1em;
 }
+.company-money {
+	font-size: 12pt;
+}
 /**
 Страница предприятий
  */
@@ -187,28 +190,34 @@ h3 {
 	background-color: #d6d6e0;
 	padding: 2px 0;
 }
-.products-table input[type=text], .data-form input[type=number],.data-form input[type=password], .data-form select {
+.products-table input[type=text], .products-table input[type=number],.products-table input[type=password], .products-table select {
 	width: 10em;
+}
+#dialog-window {
+	position: absolute;
+	box-shadow: 1px 1px 2px 1px grey;
+	display: none;
+	width: 76vw;
+	background-color: #eeeeee;
+	border-radius: 10px;
+	left: 12vw;
+	top: 30vh;
+	padding: 15px 10px;
 }
 /**
 Форма добавления поставки
  */
 .add-supply-form {
-	box-shadow: 1px 1px 2px 1px grey;
-	width: calc(65em + 40px);
-	background-color: #eeeeee;
-	border-radius: 10px;
-	position: absolute;
-	margin-left: -55em;
-	margin-top: -0.5em;
-	padding: 10px 10px;
+
 }
 .add-supply-title {
 	text-align: center;
 	font-weight: bold;
 	color: #0c183a;
+	padding-bottom: 7px;
+	font-size: 14pt;
 }
-.category-item {
+.supply-item {
 	display: inline-block;
 	border-width: 1px;
 	border-style: dashed;
@@ -218,6 +227,34 @@ h3 {
 	margin: 3px 0px;
 	cursor: pointer;
 }
-.category-item:hover {
+.supply-item:hover {
 	background-color: #bfbfce;
+}
+.category-item {
+
+}
+.product-type-item {
+
+}
+.supplier-items {
+	width: 100%;
+	border-spacing: 0px;
+}
+.supplier-items td, .supplier-items th  {
+	border-bottom-style: solid;
+	border-width: 1px;
+	padding: 5px 0;
+	border-color: gray;
+}
+.supplier-items .select-supplier {
+	cursor: pointer;
+	font-size: 14pt;
+	display: inline-block;
+	margin-left: 6px;
+}
+.supplier-items .select-supplier:hover {
+	color: #1f3b8c;
+}
+.supplier-items input[type=number] {
+	width: 5em;
 }

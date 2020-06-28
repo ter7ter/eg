@@ -16,6 +16,9 @@
         <?if (count($data['companyList']) == 1):?>
         <div class="company-name">Компания "<?=$data['openedCompany']['title']?>"</div>
         <?endif;?>
+        <div class="company-money">
+            Ваш баланс <?=$data['openedCompany']['money']?> <?=$data['openedCompany']['currency']['name']?>
+        </div>
         </div>
         <?endif;?>
         <ul>

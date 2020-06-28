@@ -32,12 +32,65 @@ function format_timestamp($date, $time = false) {
         return $day;
     }
 }
-function timestamp_to_db($time) {
+function timestamp_to_db($time = false) {
+    if (!$time) {
+        $time = time();
+    }
     return date('Y-m-d H:i:s', $time);
 }
 function format_date($date, $time = false) {
     $date = strtotime($date);
     return format_timestamp($date, $time);
+}
+function format_time($time) {
+    $days = floor($time / 86400);
+    $time -= $days*86400;
+    $hours = floor($time / 3600);
+    $time -= $hours*3600;
+    $minutes = floor($time / 60);
+    $time -= $minutes*60;
+    $result = '';
+    if ($days > 0) {
+        $result .= $days;
+        if ($days % 10 == 1 && $days != 11) {
+            $result .= ' день ';
+        } elseif ($days % 10 > 1 && $days % 10 < 5 && floor($days / 10) != 1) {
+            $result .= ' дня ';
+        } else {
+            $result .= ' дней ';
+        }
+    }
+    if ($hours > 0) {
+        $result .= $hours;
+        if ($hours % 10 == 1 && $hours != 11) {
+            $result .= ' час ';
+        } elseif ($hours % 10 > 1 && $hours % 10 < 5 && floor($hours / 10) != 1) {
+            $result .= ' часа ';
+        } else {
+            $result .= ' часов ';
+        }
+    }
+    if ($minutes > 0) {
+        $result .= $minutes;
+        if ($minutes % 10 == 1 && $minutes != 11) {
+            $result .= ' минута ';
+        } elseif ($minutes % 10 > 1 && $minutes % 10 < 5 && floor($minutes / 10) != 1) {
+            $result .= ' минуты ';
+        } else {
+            $result .= ' минут ';
+        }
+    }
+    if ($time > 0) {
+        $result .= $time;
+        if ($time % 10 == 1 && $time != 11) {
+            $result .= ' секунда ';
+        } elseif ($time % 10 > 1 && $time % 10 < 5 && floor($time / 10) != 1) {
+            $result .= ' секунды ';
+        } else {
+            $result .= ' секунд ';
+        }
+    }
+    return $result;
 }
 function check_captha($val) {
     return true;

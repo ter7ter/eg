@@ -1,3 +1,6 @@
+<script type="text/javascript">
+    var unit_id = <?=$data['unit']['id']?>;
+</script>
 <div class="data-form" id="unit-form">
     <h3><?=$data['unit']['title']?></h3>
     <div class="form-tabs">
@@ -29,6 +32,8 @@
         </tr>
         <?endforeach;?>
     </table>
+    <div id="dialog-window"></div>
+    <a class="link-button do-add-supply-product" href="#this">Добавить поставку</a>
     <?endif;?>
     <?if ($tab == 'sale'):?>
     <form action="/unit&id=<?=$data['unit']['id']?>&tab=sale" method="post">

@@ -56,7 +56,7 @@ class Company extends Base {
         parent::__construct($data);
 
         $this->user = User::get($this->userId);
-        $this->currency = User::get($this->currencyId);
+        $this->currency = Currency::get($this->currencyId);
     }
 
     public function save() {

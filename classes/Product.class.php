@@ -47,7 +47,7 @@ class Product extends Base {
         parent::__construct($data);
         $this->type = ProductType::get($this->typeId);
         if ($this->unitId) {
-            $this->unit = UnitType::get($this->unitId);
+            $this->unit = Unit::get($this->unitId);
         }
     }
 
@@ -72,6 +72,7 @@ class Product extends Base {
         );
         $product->amount = $amount;
         $this->amount -= $amount;
+        return $product;
     }
 
     /**
@@ -128,6 +129,61 @@ class Product extends Base {
         return $amount;
     }
 
+    public function get_sale_data() {
+        if (!$this->unit) {
+            return false;
+        }
+        return MyDB::query("SELECT * FROM product_sale WHERE typeId = ?type_id AND unitId = ?unit_id",
+            ['type_id' => $this->type->id, 'unit_id' => $this->unit->id], 'row');
+    }
+
+    /**
+     * Осуществить закупку
+     * @param int $amount
+     * @param Unit $unitTo
+     * @return bool
+     */
+    public function buy($amount, $unitTo) {
+        $saleData = $this->get_sale_data();
+        if (!$saleData) {
+            return false;
+        }
+        if ($saleData['access'] == 'close') {
+            return false;
+        }
+        if ($saleData['access'] == 'private' && $this->unit->company != $unitTo->company) {
+            return false;
+        }
+        if ($this->unit->company != $unitTo->company && $amount*$saleData['price'] < $this->unit->company->money) {
+            return false;
+        }
+        if ($this->amount < $amount) {
+            $amount = floor($this->amount);
+        }
+        if ($amount < 1) {
+            return false;
+        }
+        $amountFrom = $amount*$saleData['price'];
+        $amountTo = -1*$amount*$saleData['price'];
+        MyDB::insert('unit_sale',
+            ['unitFrom' => $this->unit->id,
+            'unitTo' => $unitTo->id,
+            'productType' => $this->type->id,
+            'valueFrom' => $amountFrom,
+            'valueTo' => $amountTo,
+            'amount' => $amount,
+            'quality' => $this->quality,
+            'date' => timestamp_to_db()]);
+        $this->unit->company->money += $amountFrom;
+        $unitTo->company->money -= $amountTo;
+        $this->unit->company->save();
+        if ($this->unit->company != $unitTo->company) {
+            $unitTo->company->save();
+        }
+        $result = $this->transport($unitTo, $amount);
+        return $result;
+    }
+
     /**
      * @param Unit $unitTo
      * @param float $amount
@@ -141,10 +197,11 @@ class Product extends Base {
         }
         if ($this->amount > $amount) {
             $product = $this->separate($amount);
+            $this->save();
         } else {
             $product = $this;
         }
-        $product->unitId = null;
+        $product->unit = null;
         $product->save();
         Transport::add($product, $unitFrom, $unitTo);
         return true;

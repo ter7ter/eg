@@ -49,16 +49,49 @@ function create_unit_page() {
 }
 
 function unit_page() {
-    $('.do-add-supply').click(function () {
-        var td = $(this).closest('td');
-        var line = $(this).closest('tr');
+    $(document).on('click', '.do-add-supply-product', function (e) {
         $.get('/add_supply', function (data) {
-            td.append('<tr><td colspan="4">'+data+'</td></tr>');
+            $('#dialog-window').html(data);
+            $('#dialog-window').show();
         });
     });
-    $('.category-item').click(function () {
-        $.post('/add_supply', {'step': 2, 'category_id': $(this).attr('data-id') }, function (data) {
-            td.append('<tr><td colspan="4">'+data+'</td></tr>');
+    $(document).on('click', '.category-item', function (e) {
+        $.post('/add_supply', {'step': 2, 'category_id': $(e.currentTarget).attr('data-id') }, function (data) {
+            $('#dialog-window').html(data);
+            $('#dialog-window').show();
+        });
+    });
+    $(document).on('click', '.product-type-item', function (e) {
+        $.post('/add_supply', {'step': 3, 'type_id': $(e.currentTarget).attr('data-id'), 'unit_id': unit_id }, function (data) {
+            $('#dialog-window').html(data);
+            $('#dialog-window').show();
+        });
+    });
+    $(document).on('click', '.do-add-supply', function (e) {
+        $.post('/add_supply', {'step': 3, 'type_id': $(e.currentTarget).attr('data-id'), 'unit_id': unit_id }, function (data) {
+            $('#dialog-window').html(data);
+            $('#dialog-window').show();
+        });
+    });
+    $(document).on('click', '.select-supplier', function (e) {
+        var amount = parseInt($(e.currentTarget).closest('tr').find('.select-supply-count').val());
+        if (amount < 1) {
+            window.alert('Введите количество');
+        }
+        var vars = {'step': 4,
+            'type_id': $(e.currentTarget).closest('.add-supply-form').attr('data-type-id'),
+            'unit_id': unit_id,
+            'supplier_unit': $(e.currentTarget).closest('tr').attr('data-id'),
+            'amount': amount
+        };
+        $.post('/add_supply&json=1', vars, function (data) {
+            response = $.parseJSON(data);
+            if (response.status == 'ok') {
+                //$('#dialog-window').hide();
+                window.location.reload();
+            } else {
+                window.alert('Ошибка: ' + response.error);
+            }
         });
     });
 }
