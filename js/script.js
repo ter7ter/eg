@@ -87,12 +87,44 @@ function unit_page() {
         $.post('/add_supply&json=1', vars, function (data) {
             response = $.parseJSON(data);
             if (response.status == 'ok') {
-                //$('#dialog-window').hide();
                 window.location.reload();
             } else {
                 window.alert('Ошибка: ' + response.error);
             }
         });
+    });
+    $(document).on('click', '.do-unload', function (e) {
+        var amount = parseInt($(e.currentTarget).closest('tr').find('.select-supply-count').val());
+        if (amount < 1) {
+            window.alert('Введите количество');
+        }
+        $.post('/storage_unload',
+            {'step': 1, 'type_id': $(e.currentTarget).attr('data-type-id'), 'unit_id': unit_id, 'amount': amount },
+            function (data) {
+            $('#dialog-window').html(data);
+            $('#dialog-window').show();
+        });
+    });
+    $(document).on('click', '.select-unit', function (e) {
+        var vars = {'step': 2,
+            'type_id': $(e.currentTarget).closest('.add-supply-form').attr('data-type-id'),
+            'unit_id': unit_id,
+            'storage_unit': $(e.currentTarget).attr('data-id'),
+            'amount': $(e.currentTarget).closest('.add-supply-form').attr('data-amount'),
+        };
+        $.post('/storage_unload&json=1', vars, function (data) {
+            response = $.parseJSON(data);
+            if (response.status == 'ok') {
+                window.location.reload();
+            } else {
+                window.alert('Ошибка: ' + response.error);
+            }
+        });
+    });
+    $(document).on('click', function (e) {
+        if ($(e.target).closest('#dialog-window').length == 0) {
+            $('#dialog-window').hide();
+        }
     });
 }
 

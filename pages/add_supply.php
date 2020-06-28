@@ -24,7 +24,7 @@ switch ($step) {
         $data['productTypes'] = ProductType::get_list_info(['categoryId' => $categoryId]);
     break;
     case 3:
-        $data['productType'] = $productType->id;
+        $data['productType'] = $productType->get_info();
         $data['allCount'] = $unit->get_supply_list_count($productType);
         $data['perPage'] = UNIT_SUPPLY_PAGE;
         $data['currentPage'] = intval($_REQUEST['page'] ?? 1);

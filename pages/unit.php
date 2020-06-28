@@ -2,7 +2,7 @@
 $unit = false;
 $id = intval(@$_REQUEST['id']);
 $tab = $_REQUEST['tab'] ?? 'info';
-if (!in_array($tab, ['info', 'supply', 'sale'])) {
+if (!in_array($tab, ['info', 'supply', 'sale', 'storage', 'shop'])) {
     $tab = 'info';
 }
 if ($id) {
@@ -21,6 +21,21 @@ if ($unit) {
                 $unit->update_sell_price($typeId, $price, $_REQUEST['access'][$typeId]);
             }
         break;
+        case 'update_shop':
+            if (!is_array($_REQUEST['price'])) break;
+            foreach ($_REQUEST['price'] as $typeId => $price) {
+                $unit->update_shop_price($typeId, $price);
+            }
+            $unit->calculateShopFactor();
+        break;
+    }
+    if (($tab == 'shop' || $tab == 'storage') && $unit->type->type != 'shop') {
+        //Эти вкладки только для магазинов
+        $tab = 'info';
+    }
+    if ($tab == 'sale' && $unit->type->type == 'shop') {
+        //Эта вкладка не для магазинов
+        $tab = 'info';
     }
 
     $data['unit'] = $unit->get_info(true);
@@ -59,9 +74,31 @@ if ($unit) {
             }
         }
     }
-    switch ($tab) {
-        case 'supply':
 
+    switch ($tab) {
+        case 'info':
+            $data['unit']['statistic'] = $unit->get_statistic();
+        break;
+        case 'storage':
+            $products = $unit->get_products();
+            foreach ($products as $product) {
+                $data['products'][$product->type->id] = $product->get_info();
+            }
+        break;
+        case 'shop':
+            $data['goods'] = [];
+            $products = $unit->get_products();
+            foreach ($products as $product) {
+                if ($product->type->type != 'final') continue;
+                $data['goods'][$product->type->id] = $product->get_info();
+                $data['goods'][$product->type->id]['price'] = 0;
+            }
+            $goods = $unit->get_product_shop();
+            foreach ($goods as $good) {
+                if (isset($data['goods'][$good['typeId']])) {
+                    $data['goods'][$good['typeId']]['price'] = $good['price'];
+                }
+            }
         break;
         case 'sale':
             $sells = $unit->get_product_sells();

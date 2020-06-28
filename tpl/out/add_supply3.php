@@ -1,4 +1,4 @@
-<div class="add-supply-form" data-type-id="<?=$data['productType']?>">
+<div class="add-supply-form" data-type-id="<?=$data['productType']['id']?>">
     <div class="add-supply-title">Доступные поставщики</div>
     <table class="supplier-items">
         <tr>

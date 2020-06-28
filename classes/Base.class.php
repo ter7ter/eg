@@ -90,11 +90,10 @@ class Base
         return $result;
     }
 
-    public static function get_list(array $filter = [], array $order = [], $start = false, $limit =  false, $join = '')
-    {
+    private static function list_query(array $filter = [], &$vars, $join = '') {
         $classname = get_called_class();
-        $query = "SELECT id FROM ?tablename".$join;
-        $vars = ['tablename' => $classname::$tablename];
+        $query = " FROM ?tablename".$join;
+        $vars['tablename'] = $classname::$tablename;
         if (count($filter) > 0) {
             $query .= ' WHERE ';
             $parts = [];
@@ -111,15 +110,31 @@ class Base
                         foreach ($value as $in) {
                             $ins[] = $db->real_escape_string($in);
                         }
-                        $parts[] = "`{$field}` IN ('".join("','", $ins) ."')";
+                        $parts[] = "{$field} IN ('".join("','", $ins) ."')";
                     }
                 } else {
-                    $parts[] = "`{$field}` = '?{$field}'";
+                    $parts[] = "{$field} = '?{$field}'";
                     $vars[$field] = $value;
                 }
             }
             $query .= join(' AND ', $parts);
         }
+        return $query;
+    }
+
+    public static function get_list_count(array $filter = [], $join = '')
+    {
+        $classname = get_called_class();
+        $vars = [];
+        $query = "SELECT count(*) ".$classname::list_query($filter, $vars, $join);
+        return MyDB::query($query, $vars, 'elem');
+    }
+
+    public static function get_list(array $filter = [], array $order = [], $start = false, $limit =  false, $join = '')
+    {
+        $classname = get_called_class();
+        $vars = [];
+        $query = "SELECT {$classname::$tablename}.id ".$classname::list_query($filter, $vars, $join);
         if (count($order) > 0) {
             $parts = [];
             foreach ($order as $field => $value) {

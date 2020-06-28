@@ -84,6 +84,10 @@ class Unit extends Base {
             WHERE product_sale.unitId = ?id", ['id' => $this->id]);
     }
 
+    public function get_product_shop() {
+        return MyDB::query("SELECT typeId, price FROM product_shop WHERE unitId = ?unit_id", ['unit_id' => $this->id]);
+    }
+
     /**
      * @param ProductType $type
      * @return Product|bool
@@ -173,7 +177,7 @@ class Unit extends Base {
             INNER JOIN product ON product.typeId = product_shop.typeId AND product.unitId = product_shop.unitId
             WHERE product_shop.unitId = ?id AND price > 0 AND product.amount >= 1", ['id' => $this->id]);
         foreach ($sells as $sell) {
-            $factor = $sell['quality']/$sell['price'];
+            $factor = 100*($sell['quality']/$sell['price']);
             MyDB::update('product_shop', ['shopFactor' => $factor], " unitId = {$this->id} AND typeId = {$sell['typeId']}");
         }
     }
@@ -184,6 +188,12 @@ class Unit extends Base {
         return $result;
     }
 
+    /**
+     * @param int $typeId
+     * @param float $price
+     * @param string $access
+     * @throws Exception
+     */
     public function update_sell_price($typeId, $price, $access) {
         $price = floatval($price);
         if (!in_array($access, ['all', 'private', 'list', 'close'])) {
@@ -193,6 +203,19 @@ class Unit extends Base {
             SET unitId = ?unit_id, typeId = ?type_id, price = '?price', access = '?access', currencyId = ?currency_id
             ON DUPLICATE KEY UPDATE price = '?price', access = '?access', currencyId = ?currency_id",
             ['unit_id' => $this->id, 'type_id' => $typeId, 'currency_id' => $this->company->currency->id, 'price' => $price, 'access' => $access]);
+    }
+
+    /**
+     * @param int $typeId
+     * @param float $price
+     * @throws Exception
+     */
+    public function update_shop_price($typeId, $price) {
+        $price = floatval($price);
+        MyDB::query("INSERT INTO product_shop 
+            SET unitId = ?unit_id, typeId = ?type_id, price = '?price', cityId = ?city_id, shopFactor = 0
+            ON DUPLICATE KEY UPDATE price = '?price'",
+            ['unit_id' => $this->id, 'type_id' => $typeId, 'price' => $price, 'city_id' => $this->city->id]);
     }
 
     private static function supply_query() {
@@ -241,5 +264,28 @@ class Unit extends Base {
     public function get_supply_list_count($productType) {
         $query = "SELECT count(*) ".Unit::supply_query();
         return MyDB::query($query, ['company_id' => $this->company->id, 'type_id' => $productType->id, 'currency_id' => $this->company->currency->id, 'unit_id' => $this->id], 'elem');
+    }
+
+    public function get_statistic() {
+        $queryTo = "SELECT sum(valueTo) FROM unit_sale WHERE unitTo = ?unit_id AND `date` BETWEEN '?date1' AND '?date2'";
+        $queryFrom = "SELECT sum(valueFrom) FROM unit_sale WHERE unitFrom = ?unit_id AND `date` BETWEEN '?date1' AND '?date2'";
+        $result = [];
+        $date2 = timestamp_to_db();
+        $result['hour']['valueTo'] = MyDB::query($queryTo,
+            ['unit_id' => $this->id, 'date1' => timestamp_to_db(time() - 3600), 'date2' => $date2], 'elem');
+        $result['day']['valueTo'] = MyDB::query($queryTo,
+            ['unit_id' => $this->id, 'date1' => timestamp_to_db(time() - 24*3600), 'date2' => $date2], 'elem');
+        $result['hour']['valueFrom'] = MyDB::query($queryFrom,
+            ['unit_id' => $this->id, 'date1' => timestamp_to_db(time() - 3600), 'date2' => $date2], 'elem');
+        $result['day']['valueFrom'] = MyDB::query($queryFrom,
+            ['unit_id' => $this->id, 'date1' => timestamp_to_db(time() - 24*3600), 'date2' => $date2], 'elem');
+        foreach (['day', 'hour'] as $interval) {
+            foreach (['valueTo', 'valueFrom'] as $direction) {
+                if  (!$result[$interval][$direction]) {
+                    $result[$interval][$direction] = 0;
+                }
+            }
+        }
+        return $result;
     }
 }

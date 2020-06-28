@@ -17,7 +17,9 @@ foreach ($data as $row) {
         $transportProduct->unit = $unit;
         $transportProduct->save();
     }
-    $unit->calculateShopFactor();
+    if ($unit->type->type == 'shop' && $transportProduct->type->type == 'final') {
+        $unit->calculateShopFactor();
+    }
     print("finish to unit {$unit->id} \n");
     MyDB::end_transaction();
 }

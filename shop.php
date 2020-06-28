@@ -12,9 +12,10 @@ foreach ($productDemand as $demand) {
     $sellBudget = $needSellCount*$mPrice; //Бюджет на эти покупки у жителей
     $sells = MyDB::query("SELECT product.id, product_shop.unitId, product_shop.shopFactor, product_shop.price FROM product_shop
             INNER JOIN product ON product.typeId = product_shop.typeId AND product.unitId = product_shop.unitId
-            WHERE product_shop.typeId = ?type AND product_shop.cityId = ?cid AND price > 0 AND product.amount >= 1
+            WHERE product_shop.typeId = ?type_id AND product_shop.cityId = ?city_id AND price > 0 AND product.amount >= 1
             ORDER BY RAND()",
-            ['typeId' => $demand['productType'], 'cityId' => $demand['cityId']]);
+            ['type_id' => $demand['productType'], 'city_id' => $demand['cityId']]);
+    if (count($sells) == 0) continue;
     $factorSum = 0;
     $minPrice = $sells[0]['price'];
     foreach ($sells as $sell) {

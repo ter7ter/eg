@@ -113,7 +113,7 @@ class Product extends Base {
         if ($this->type->type != 'final') {
             return 0;
         }
-        if (!$this->unit || $this->unit->type != 'shop') {
+        if (!$this->unit || $this->unit->type->type != 'shop') {
             return 0;
         }
         if ($this->amount < $amount) {
@@ -121,6 +121,15 @@ class Product extends Base {
         }
         $this->amount -= $amount;
         $this->unit->company->money += $price*$amount;
+        MyDB::insert("unit_sale",
+            ['unitFrom' => $this->unit->id,
+                'unitTo' => 'NULL',
+                'productType' => $this->type->id,
+                'valueFrom' => $price*$amount,
+                'valueTo' => 0,
+                'amount' => $amount,
+                'quality' => $this->quality,
+                'date' => timestamp_to_db()]);
         if ($this->amount == 0) {
             $this->delete();
         } else {
@@ -175,7 +184,7 @@ class Product extends Base {
             'quality' => $this->quality,
             'date' => timestamp_to_db()]);
         $this->unit->company->money += $amountFrom;
-        $unitTo->company->money -= $amountTo;
+        $unitTo->company->money += $amountTo;
         $this->unit->company->save();
         if ($this->unit->company != $unitTo->company) {
             $unitTo->company->save();

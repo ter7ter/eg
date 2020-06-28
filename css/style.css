@@ -175,6 +175,7 @@ h3 {
 	width: 80em;
 	margin-left: calc(50% - 40em);
 	display: inline-block;
+	text-align: left;
 }
 .products-table {
 	width: 100%;
@@ -185,10 +186,13 @@ h3 {
 .products-table th {
 	background-color: #9eb8df;
 	padding: 2px 0;
+	text-align: center;
 }
 .products-table td {
 	background-color: #d6d6e0;
 	padding: 4px 0;
+	text-align: center;
+	vertical-align: top;
 }
 .products-table input[type=text], .products-table input[type=number],.products-table input[type=password], .products-table select {
 	width: 10em;
@@ -252,13 +256,13 @@ h3 {
 	padding: 5px 0;
 	border-color: gray;
 }
-.supplier-items .select-supplier {
+.supplier-items .select-supplier, .select-unit {
 	cursor: pointer;
 	font-size: 14pt;
 	display: inline-block;
 	margin-left: 6px;
 }
-.supplier-items .select-supplier:hover {
+.supplier-items .select-supplier:hover, .select-unit:hover {
 	color: #1f3b8c;
 }
 .supplier-items input[type=number] {
