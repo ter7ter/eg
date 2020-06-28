@@ -38,6 +38,10 @@ class Transport
      * @throws Exception
      */
     public static function get_finish() {
-        return MyDB::query("SELECT * FROM transport WHERE endTime <= NOW() ORDER BY endTime ASC");
+        return MyDB::query("SELECT * FROM transport WHERE endTime <= '?time' ORDER BY endTime ASC", ['time' => timestamp_to_db()]);
+    }
+
+    public static function delete($id) {
+        MyDB::query("DELETE FROM transport WHERE id = ?id", ['id' => $id]);
     }
 }

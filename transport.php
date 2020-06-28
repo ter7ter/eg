@@ -10,6 +10,7 @@ foreach ($data as $row) {
     }
     $transportProduct = Product::get($row['productId']);
     $unitProduct = $unit->get_product_by_type($transportProduct->type);
+    Transport::delete($row['id']);
     if ($unitProduct) {
         $unitProduct->union($transportProduct);
     } else {
@@ -17,5 +18,7 @@ foreach ($data as $row) {
         $transportProduct->save();
     }
     $unit->calculateShopFactor();
+    print("finish to unit {$unit->id} \n");
     MyDB::end_transaction();
 }
+print "ok";

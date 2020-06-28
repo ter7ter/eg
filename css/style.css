@@ -188,7 +188,7 @@ h3 {
 }
 .products-table td {
 	background-color: #d6d6e0;
-	padding: 2px 0;
+	padding: 4px 0;
 }
 .products-table input[type=text], .products-table input[type=number],.products-table input[type=password], .products-table select {
 	width: 10em;
@@ -203,6 +203,12 @@ h3 {
 	left: 12vw;
 	top: 30vh;
 	padding: 15px 10px;
+}
+.product-supply {
+	width: 100%;
+}
+.product-supply td, .product-supply th {
+	background-color: transparent;
 }
 /**
 Форма добавления поставки

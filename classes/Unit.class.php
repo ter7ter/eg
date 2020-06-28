@@ -90,7 +90,8 @@ class Unit extends Base {
      * @throws Exception
      */
     public function get_product_by_type($type) {
-        $id = MyDB::query("SELECT id FROM product WHERE typeId = ?tid", ['tid' => $type->id], 'elem');
+        $id = MyDB::query("SELECT id FROM product WHERE typeId = ?type_id AND unitId = ?unit_id",
+            ['type_id' => $type->id, 'unit_id' => $this->id], 'elem');
         if ($id) {
             return Product::get($id);
         } else {
