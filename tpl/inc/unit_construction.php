@@ -36,6 +36,8 @@
         <tr>
             <td><?=$make['company']['title']?></td>
             <td><?=$make['unit']['title']?>(<?=$make['unit']['type']['title']?>)</td>
+            <td><?=$make['unit']['type']['cost']?></td>
+            <td><?=$make['quality']?></td>
             <td><?=$make['makingPrice']?></td>
             <td><?=round($make['complete']*100)?>%</td>
             <td><?=format_time(round($time))?></td>

@@ -61,7 +61,7 @@ class Unit extends Base {
         $this->city = City::get($this->cityId);
         $this->type = UnitType::get($this->typeId);
         if ($this->type->type == 'construction') {
-            $data = MyDB::query("SELECT * FROM product_construction WHERE unitId = ?id", ['id' => $this->id], 'row');
+            $data = MyDB::query("SELECT * FROM unit_construction WHERE unitId = ?id", ['id' => $this->id], 'row');
             if ($data) {
                 $this->makePrice = $data['price'];
                 $this->makeAccess = $data['access'];
@@ -75,7 +75,7 @@ class Unit extends Base {
         $this->typeId = $this->type->id;
         parent::save();
         if ($this->type->type == 'construction') {
-            MyDB::query("INSERT INTO product_construction SET unitId = ?id, price = ?price, access = '?access'
+            MyDB::query("INSERT INTO unit_construction SET unitId = ?id, price = ?price, access = '?access'
                 ON DUPLICATE KEY UPDATE price = ?price, access = '?access'",
                 ['id' => $this->id, 'price' => $this->makePrice, 'access' => $this->makeAccess]);
         }
@@ -293,7 +293,7 @@ class Unit extends Base {
             $orderDirection = $order[$orderField];
         } else {
             $orderField = 'price';
-            $orderDirection = 'DESC';
+            $orderDirection = 'ASC';
         }
 
         $query .= " ORDER BY ?order ?direction";
@@ -319,6 +319,7 @@ class Unit extends Base {
     /**
      * Возвращает очередь строительства для строительного предприятия
      * @return array
+     * @throws Exception
      */
     public function get_construction_queue() {
         if ($this->type->type != 'construction') {
@@ -328,11 +329,8 @@ class Unit extends Base {
         $list = MyDB::query("SELECT * FROM unit_making WHERE unitId = ?unit_id ORDER BY id", ['unit_id' => $this->id]);
         foreach ($list as $item) {
             $makeUnit = Unit::get($item['makeId']);
-            $result[] = [
-                'id' => $item['id'],
-                'makeUnit' => $makeUnit,
-                'remaindCost' => $item['remaindCost']
-            ];
+            $item['makeUnit'] = $makeUnit;
+            $result[] = $item;
         }
         return $result;
     }

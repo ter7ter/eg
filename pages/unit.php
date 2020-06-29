@@ -158,7 +158,8 @@ if ($unit) {
                     'makeCost' => $item['makeUnit']->type->cost,
                     'makingPrice' => $item['makingPrice'],
                     'remaindCost' => $item['remaindCost'],
-                    'complete'  => ($item['makeUnit']->type->cost->type->cost-$item['remaindCost'])/$item['makeUnit']->type->cost,
+                    'quality' => $item['quality'],
+                    'complete'  => ($item['makeUnit']->type->cost - $item['remaindCost'])/$item['makeUnit']->type->cost,
                     'time'      => $item['remaindCost']*3600/$constructionPower['amount']
                 ];
             }
