@@ -12,6 +12,8 @@ define('UNIT_TITLE_MIN', 4);
 define('UNIT_TITLE_MAX', 30);
 define('UNIT_SUPPLY_PAGE', 10);
 
+define('CONSTRUCTION_MATERIAL', 14);
+
 /**
  * Размеры картинки пользователя
  */

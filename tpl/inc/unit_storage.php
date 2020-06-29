@@ -9,7 +9,7 @@
         <tr>
             <td><?=$product['type']['title']?></td>
             <td><?=$product['amount']?></td>
-            <td><?=$product['quality']?></td>
+            <td><?=format_quality($product['quality'])?></td>
             <td>
                 <input class="select-supply-count" type="number" value="0" min="0" max="<?=$product['amount']?>">
                 <a class="do-unload" data-type-id="<?=$product['type']['id']?>" href="#this">Выгрузить</a>

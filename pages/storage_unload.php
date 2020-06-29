@@ -42,11 +42,18 @@ switch ($step) {
             $error = 'Товар не найден';
             break;
         }
-        if ($data['amount'] > $product->amount) {
-            $data['amount'] = floor($product->amount);
+        $freeAmount = $product->amount;
+        if ($unit->type->type == 'construction') {
+            $constructionQueue = $unit->get_construction_queue();
+            foreach ($constructionQueue as $item) {
+                $freeAmount -= $item['remaindCost'];
+            }
+        }
+        if ($data['amount'] > $freeAmount) {
+            $data['amount'] = floor($freeAmount);
         }
         $targetUnit = Unit::get(intval($_REQUEST['storage_unit']));
-        if (!$targetUnit) {
+        if (!$targetUnit || $targetUnit->type->type != 'storage') {
             $error = 'Склад не найден';
             break;
         }

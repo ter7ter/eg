@@ -42,6 +42,9 @@ class Unit extends Base {
         ],
     ];
 
+    public $makePrice = 0;
+    public $makeAccess = 'close';
+
     /**
      * @param $id
      * @return Unit|bool
@@ -57,6 +60,13 @@ class Unit extends Base {
         $this->company = Company::get($this->companyId);
         $this->city = City::get($this->cityId);
         $this->type = UnitType::get($this->typeId);
+        if ($this->type->type == 'construction') {
+            $data = MyDB::query("SELECT * FROM product_construction WHERE unitId = ?id", ['id' => $this->id], 'row');
+            if ($data) {
+                $this->makePrice = $data['price'];
+                $this->makeAccess = $data['access'];
+            }
+        }
     }
 
     public function save() {
@@ -64,6 +74,11 @@ class Unit extends Base {
         $this->cityId = $this->city->id;
         $this->typeId = $this->type->id;
         parent::save();
+        if ($this->type->type == 'construction') {
+            MyDB::query("INSERT INTO product_construction SET unitId = ?id, price = ?price, access = '?access'
+                ON DUPLICATE KEY UPDATE price = ?price, access = '?access'",
+                ['id' => $this->id, 'price' => $this->makePrice, 'access' => $this->makeAccess]);
+        }
     }
 
     /**
@@ -78,14 +93,42 @@ class Unit extends Base {
         return $result;
     }
 
+    /**
+     * Список товаров, которые стоят на сбыт
+     * @return array
+     * @throws Exception
+     */
     public function get_product_sells() {
         return MyDB::query("SELECT product_sale.typeId, product_sale.price, product_sale.access FROM product_sale 
             INNER JOIN product ON product.typeId = product_sale.typeId AND product.unitId = product_sale.unitId
             WHERE product_sale.unitId = ?id", ['id' => $this->id]);
     }
 
+    /**
+     * Список товаров на витрине в магазине
+     * @return array
+     * @throws Exception
+     */
     public function get_product_shop() {
         return MyDB::query("SELECT typeId, price FROM product_shop WHERE unitId = ?unit_id", ['unit_id' => $this->id]);
+    }
+
+    /**
+     * Список что тут производится
+     * @return array
+     * @throws Exception
+     */
+    public function get_product_making() {
+        return MyDB::query("SELECT * FROM production_making WHERE unitType = ?unit_type_id", ['unit_type_id' => $this->type->id]);
+    }
+
+    /**
+     * Список того, что требуется для производства
+     * @return array
+     * @throws Exception
+     */
+    public function get_product_cost() {
+        return MyDB::query("SELECT * FROM production_cost WHERE unitType = ?unit_type_id", ['unit_type_id' => $this->type->id]);
     }
 
     /**
@@ -128,12 +171,12 @@ class Unit extends Base {
     }
 
     public function calculate() {
-        if (in_array($this->type, ['factory', 'farm', 'mine'])) {
+        if (in_array($this->type->type, ['factory', 'farm', 'mine'])) {
             $production = 1;
             $qualities = [];
             $products = $this->get_products();
             $time = (time() - strtotime($this->lastUpdate)) / 3600;
-            $costs = MyDB::query("SELECT * FROM production_cost WHERE unitType = ?type", ['type' => $this->type]);
+            $costs = MyDB::query("SELECT * FROM production_cost WHERE unitType = ?type", ['type' => $this->type->id]);
             foreach ($costs as $cost) {
                 if (!isset($products[$cost['productType']])) {
                     $production = 0;
@@ -146,9 +189,12 @@ class Unit extends Base {
                     }
                 }
             }
+            if (count($qualities) == 0) {
+                $qualities = [1];
+            }
             if ($production > 0) {
                 $quality = array_avg($qualities);
-                $making = MyDB::query("SELECT * FROM production_making WHERE unitType = ?type", ['type' => $this->type]);
+                $making = MyDB::query("SELECT * FROM production_making WHERE unitType = ?type", ['type' => $this->type->id]);
                 foreach ($making as $make) {
                     if (isset($products[$make['productType']])) {
                         $products[$make['productType']]->add($make['amount'] * $time * $production, $quality * $make['quality']);
@@ -185,6 +231,10 @@ class Unit extends Base {
     public function get_info($owner = false) {
         $result = $this->get_fields(['id', 'title']);
         $result['type'] = $this->type->get_info();
+        if ($this->type->type == 'construction') {
+            $result['makePrice'] = $this->makePrice;
+            $result['makeAccess'] = $this->makeAccess;
+        }
         return $result;
     }
 
@@ -264,6 +314,27 @@ class Unit extends Base {
     public function get_supply_list_count($productType) {
         $query = "SELECT count(*) ".Unit::supply_query();
         return MyDB::query($query, ['company_id' => $this->company->id, 'type_id' => $productType->id, 'currency_id' => $this->company->currency->id, 'unit_id' => $this->id], 'elem');
+    }
+
+    /**
+     * Возвращает очередь строительства для строительного предприятия
+     * @return array
+     */
+    public function get_construction_queue() {
+        if ($this->type->type != 'construction') {
+            return [];
+        }
+        $result = [];
+        $list = MyDB::query("SELECT * FROM unit_making WHERE unitId = ?unit_id ORDER BY id", ['unit_id' => $this->id]);
+        foreach ($list as $item) {
+            $makeUnit = Unit::get($item['makeId']);
+            $result[] = [
+                'id' => $item['id'],
+                'makeUnit' => $makeUnit,
+                'remaindCost' => $item['remaindCost']
+            ];
+        }
+        return $result;
     }
 
     public function get_statistic() {

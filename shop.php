@@ -46,6 +46,9 @@ foreach ($productDemand as $demand) {
         if ($sellBudget < $minPrice) break; //Бюджет закончился
     }
     $remCount += $needSellCount;
+    if ($remCount > $demand['baseCount']) {
+        $remCount = $demand['baseCount'];
+    }
     MyDB::query("UPDATE product_demand SET remCount = '?remCount', lastUpdate = NOW() WHERE cityId = ?cid AND productType = ?type",
         ['remCount' => $remCount, 'cid' => $demand['cityId'], 'type' => $demand['productType']]);
 }

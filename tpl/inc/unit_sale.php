@@ -12,7 +12,7 @@
             <tr>
                 <td><?=$product['type']['title']?></td>
                 <td><?=$product['amount']?></td>
-                <td><?=$product['quality']?></td>
+                <td><?=format_quality($product['quality'])?></td>
                 <td><input type="text" name="price[<?=$product['type']['id']?>]" value="<?=$product['sell']['price']?>"></td>
                 <td>
                     <select name="access[<?=$product['type']['id']?>]">

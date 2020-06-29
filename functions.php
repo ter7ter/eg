@@ -92,6 +92,9 @@ function format_time($time) {
     }
     return $result;
 }
+function format_quality($quality) {
+    return round($quality, 2);
+}
 function check_captha($val) {
     return true;
     $text = $_SESSION['captha_text'] ?? false;

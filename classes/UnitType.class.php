@@ -3,6 +3,7 @@
  * Class UnitType
  * @property string title
  * @property string type
+ * @property int cost
  */
 class UnitType extends Base {
     public static $tablename = 'unit_type';
@@ -12,6 +13,7 @@ class UnitType extends Base {
     public static $_FIELDS = [
         'title',
         'type',
+        'cost'
     ];
 
     public static $_TYPES = [
@@ -20,6 +22,16 @@ class UnitType extends Base {
         'farm'      => 'Ферма',
         'storage'   => 'Склад',
         'mine'      => 'Добывающее предприятие',
+        'construction' => 'Строительное предпрятие'
+    ];
+
+    public static $_UNIT_TABS = [
+        'shop'      => ['info', 'supply', 'storage', 'shop'],
+        'factory'   => ['info', 'supply', 'sale', 'production'],
+        'farm'      => ['info', 'supply', 'sale', 'production'],
+        'storage'   => ['info', 'supply', 'sale'],
+        'mine'      => ['info', 'supply', 'sale', 'production'],
+        'construction' => ['info', 'supply', 'construction']
     ];
 
 
@@ -49,7 +61,7 @@ class UnitType extends Base {
     }
 
     public function get_info() {
-        $result = $this->get_fields(['id', 'title', 'type']);
+        $result = $this->get_fields(['id', 'title', 'type', 'cost']);
         return $result;
     }
 }

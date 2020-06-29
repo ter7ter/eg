@@ -53,10 +53,11 @@ h3 {
 .form-tabs {
 	display: inline-block;
 	width: 100%;
-	background-color: #9eb8df;
 	padding: 0 5px;
+
 }
 .form-tabs .tab {
+	background-color: #9eb8df;
 	display: inline-block;
 	float: left;
 	padding: 5px 15px;
@@ -267,4 +268,7 @@ h3 {
 }
 .supplier-items input[type=number] {
 	width: 5em;
+}
+.select-supply-count {
+	width: 5em !important;
 }

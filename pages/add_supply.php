@@ -1,17 +1,22 @@
 <?php
 $page = 'message_error';
 $step = $_REQUEST['step'] ?? 1;
+$unit = Unit::get(intval(@$_REQUEST['unit_id']));
 if ($step == 3 || $step == 4) {
     $productType = ProductType::get(intval(@$_REQUEST['type_id']));
     if (!$productType) {
         $error = 'Такой тип товара не найден';
         $step = 0;
     }
-    $unit = Unit::get(intval(@$_REQUEST['unit_id']));
     if (!$unit) {
         $error = 'Предприятие не найдено';
         $step = 0;
     }
+}
+if ($unit && $unit->type->type == 'construction') {
+    //Сюда завозим только стройматериалы
+    $productType = ProductType::get(CONSTRUCTION_MATERIAL);
+    if ($step < 4) $step = 3;
 }
 switch ($step) {
     case 1:

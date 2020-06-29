@@ -9,7 +9,7 @@
         <tr>
             <td colspan="2"><?=$product['type']['title']?></td>
             <td><?=$product['amount']?></td>
-            <td><?=$product['quality']?></td>
+            <td><?=format_quality($product['quality'])?></td>
             <td><a href="#this" class="do-add-supply" data-id="<?=$product['type']['id']?>">Добавить поставщика</a></td>
         </tr>
         <?if (count($product['transport']) > 0):?>
@@ -38,7 +38,7 @@
                                     <?=$transport['amount']?>
                                 </td>
                                 <td>
-                                    <?=$transport['quality']?>
+                                    <?=format_quality($transport['quality'])?>
                                 </td>
                                 <td>
                                     <?=format_time($transport['time'])?>

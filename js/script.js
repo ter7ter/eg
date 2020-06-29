@@ -50,7 +50,7 @@ function create_unit_page() {
 
 function unit_page() {
     $(document).on('click', '.do-add-supply-product', function (e) {
-        $.get('/add_supply', function (data) {
+        $.post('/add_supply', {'unit_id': unit_id},function (data) {
             $('#dialog-window').html(data);
             $('#dialog-window').show();
         });
@@ -94,7 +94,12 @@ function unit_page() {
         });
     });
     $(document).on('click', '.do-unload', function (e) {
-        var amount = parseInt($(e.currentTarget).closest('tr').find('.select-supply-count').val());
+        var amount;
+        if ($(e.currentTarget).closest('tr').find('.select-supply-count').length) {
+            amount = parseInt($(e.currentTarget).closest('tr').find('.select-supply-count').val());
+        } else {
+            amount = parseInt($('.select-supply-count').val());
+        }
         if (amount < 1) {
             window.alert('Введите количество');
         }

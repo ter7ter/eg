@@ -15,6 +15,9 @@ $unitTypes = [
     ['title1' => 'добывающие предприятия',
         'title2' => 'добывающих предприятий',
         'type' => 'mine'],
+    ['title1' => 'строительные предприятия',
+        'title2' => 'строительных предприятий',
+        'type' => 'construction'],
 ];
 ?>
 <?foreach ($unitTypes as $unitType):
