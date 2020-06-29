@@ -43,6 +43,9 @@ function format_date($date, $time = false) {
     return format_timestamp($date, $time);
 }
 function format_time($time) {
+    if (!$time) {
+        return 'нет';
+    }
     $days = floor($time / 86400);
     $time -= $days*86400;
     $hours = floor($time / 3600);

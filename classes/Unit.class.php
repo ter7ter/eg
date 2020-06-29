@@ -2,6 +2,7 @@
 /**
  * Class Unit
  * @property string title
+ * @property string status
  * @property int companyId
  * @property int cityId
  * @property string typeId
@@ -14,10 +15,18 @@ class Unit extends Base {
 
     public static $_FIELDS = [
         'title',
+        'status',
         'companyId',
         'cityId',
         'typeId',
         'lastUpdate'
+    ];
+
+    public static $_STATUS = [
+        'build'     => 'строится',
+        'work'      => 'работает',
+        'update'    => 'модернизируется',
+        'close'     => 'закрыто',
     ];
 
     /**
@@ -170,12 +179,17 @@ class Unit extends Base {
         return $trasport;
     }
 
-    public function calculate() {
+    /**
+     * Просчёт производства и строительства
+     * @param int $nowTime
+     * @throws Exception
+     */
+    public function calculate($nowTime) {
         if (in_array($this->type->type, ['factory', 'farm', 'mine'])) {
             $production = 1;
             $qualities = [];
             $products = $this->get_products();
-            $time = (time() - strtotime($this->lastUpdate)) / 3600;
+            $time = ($nowTime - strtotime($this->lastUpdate)) / 3600;
             $costs = MyDB::query("SELECT * FROM production_cost WHERE unitType = ?type", ['type' => $this->type->id]);
             foreach ($costs as $cost) {
                 if (!isset($products[$cost['productType']])) {
@@ -209,7 +223,29 @@ class Unit extends Base {
                     }
                 }
             }
-            $this->lastUpdate = timestamp_to_db(time());
+            $this->lastUpdate = timestamp_to_db($nowTime);
+            $this->save();
+        } elseif ($this->type->type == 'construction') {
+            $time = $nowTime - strtotime($this->lastUpdate);
+            while ($time > 0) {
+                $nextUnit = MyDB::query("SELECT * FROM unit_making WHERE unitId = ?unit_id ORDER BY id ASC LIMIT 1",
+                    ['unit_id' => $this->id], 'row');
+                if (!$nextUnit) break;
+                $needTime = $nextUnit['remaindCost']/$this->type->buildPerformance;
+                if ($needTime < $time) {
+                    $time -= $needTime;
+                    $buildUnit = Unit::get($nextUnit['makeId']);
+                    $buildUnit->status = 'work';
+                    $buildUnit->lastUpdate = timestamp_to_db($nowTime);
+                    $buildUnit->save();
+                    MyDB::query("DELETE FROM unit_making WHERE id = ?id", ['id' => $nextUnit['id']]);
+                } else {
+                    $buildCost = $time*$this->type->buildPerformance;
+                    MyDB::update('unit_making', ['remaindCost' => $nextUnit['remaindCost'] - $buildCost], $nextUnit['id']);
+                    $time = 0;
+                }
+            }
+            $this->lastUpdate = timestamp_to_db($nowTime);
             $this->save();
         }
     }
@@ -229,7 +265,7 @@ class Unit extends Base {
     }
 
     public function get_info($owner = false) {
-        $result = $this->get_fields(['id', 'title']);
+        $result = $this->get_fields(['id', 'title', 'status']);
         $result['type'] = $this->type->get_info();
         if ($this->type->type == 'construction') {
             $result['makePrice'] = $this->makePrice;
@@ -333,6 +369,44 @@ class Unit extends Base {
             $result[] = $item;
         }
         return $result;
+    }
+
+    /**
+     * @param Unit $unit
+     * @return bool
+     * @throws Exception
+     */
+    public function add_construction_queue($unit) {
+        $material = $this->get_product_by_type(ProductType::get(CONSTRUCTION_MATERIAL));
+        if ($material->amount < $unit->type->cost) {
+            return false;
+        }
+        $this->calculate(time());
+        $price = $unit->type->cost*$this->makePrice;
+        MyDB::insert('unit_making', [ 'unitId' => $this->id,
+                                            'makeId' => $unit->id,
+                                            'makingPrice' => $price,
+                                            'remaindCost' => $unit->type->cost,
+                                            'quality' => $material->quality]);
+        $material->amount -= $unit->type->cost;
+        $material->save();
+        MyDB::insert('unit_sale',
+            [   'type' => 'build',
+                'unitFrom' => $this->id,
+                'unitTo' => $unit->id,
+                'productType' => CONSTRUCTION_MATERIAL,
+                'valueFrom' => $price,
+                'valueTo' => -1*$price,
+                'amount' => $unit->type->cost,
+                'quality' => $material->quality,
+                'date' => timestamp_to_db()]);
+        if ($this->company != $unit->company) {
+            $this->company += $price;
+            $this->company->save();
+            $unit->company -= $price;
+            $unit->company->save();
+        }
+        return true;
     }
 
     public function get_statistic() {

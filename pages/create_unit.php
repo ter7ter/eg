@@ -12,17 +12,28 @@ switch ($action) {
         $data['cityId'] = $city->id;
         $unitType = UnitType::get(intval(@$_REQUEST['typeId']));
         if (!$unitType) break;
+        $builderUnit = Unit::get(intval(@$_REQUEST['builder_unit']));
+        if (!$builderUnit) break;
+        if ($builderUnit->type->type != 'construction' || $builderUnit->city != $city) break;
+        if (($builderUnit->makeAccess == 'all' || ($builderUnit->makeAccess != 'private' && $builderUnit->company = $openedCompany)) == false) {
+            break;
+        }
+        if ($builderUnit->makePrice == 0) break;
+        $material = $builderUnit->get_product_by_type(ProductType::get(CONSTRUCTION_MATERIAL));
+        if ($material->amount < $unitType->cost) break;
         $data['typeId'] = $unitType->id;
         $data['title'] = htmlspecialchars($_REQUEST['title']);
         $unit = new Unit(
             [   'companyId' => $openedCompany->id,
                 'cityId' => $city->id,
                 'typeId' => $unitType->id,
-                'lastUpdate' => timestamp_to_db(time())]);
+                'lastUpdate' => timestamp_to_db(time()),
+                'status' => 'build']);
         $unit->set_request($_REQUEST);
         $errors = [];
         if ($unit->validate($errors)) {
             $unit->save();
+            $builderUnit->add_construction_queue($unit);
             header("Location: /units");
             $endPage = true;
         } else {

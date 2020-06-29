@@ -10,6 +10,13 @@ if ($id) {
 }
 $action = $_REQUEST['action'] ?? false;
 if ($unit) {
+    if ($unit->status != 'work') {
+        $action = false;
+        $tab = 'info';
+    }
+    if ($unit->status == 'build') {
+        //$buildTime
+    }
     switch ($action) {
         case 'update_sell':
             if (!is_array($_REQUEST['price'])) break;
@@ -165,7 +172,6 @@ if ($unit) {
             }
             $data['construction']['make'] = $constructionPower['amount'];
             $data['construction']['amount'] = $material->amount;
-            $data['construction']['freeAmount'] = $material->amount - $constructionQueueAmount;
             $data['construction']['queueAmount'] = $constructionQueueAmount;
         break;
     }

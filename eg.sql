@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Июн 29 2020 г., 09:06
+-- Время создания: Июн 29 2020 г., 17:56
 -- Версия сервера: 5.7.23
 -- Версия PHP: 7.2.10
 
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`userId`)
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `log`
@@ -204,7 +204,11 @@ INSERT INTO `log` (`id`, `type`, `userId`, `message`, `params`, `date`) VALUES
 (59, 'user_login', 1, 'Залогинился', NULL, '2020-06-28 16:50:40'),
 (60, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 05:45:21'),
 (61, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 06:28:42'),
-(62, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 09:05:38');
+(62, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 09:05:38'),
+(63, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 09:26:05'),
+(64, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 12:20:06'),
+(65, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 13:45:26'),
+(66, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 17:18:43');
 
 -- --------------------------------------------------------
 
@@ -240,7 +244,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   PRIMARY KEY (`id`),
   KEY `typeId` (`typeId`),
   KEY `unitId` (`unitId`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `product`
@@ -253,11 +257,11 @@ INSERT INTO `product` (`id`, `typeId`, `amount`, `quality`, `unitId`) VALUES
 (13, 11, 40, 4, 2),
 (15, 11, 5, 4, 5),
 (16, 11, 5, 4, 4),
-(17, 1, 21203.5, 1, 6),
+(17, 1, 42900, 1, 6),
 (18, 1, 1000, 1, 4),
-(19, 14, 40000, 1, 4),
-(20, 14, 9900, 1, 7),
-(21, 14, 100, 1, NULL);
+(19, 14, 36100, 1, 4),
+(20, 14, 4700, 1, 7),
+(22, 14, 4000, 1, 9);
 
 -- --------------------------------------------------------
 
@@ -337,27 +341,6 @@ INSERT INTO `product_category` (`id`, `title`) VALUES
 (8, 'Стройматериалы'),
 (9, 'Офисная техника'),
 (10, 'Бытовая техника');
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `product_construction`
---
-
-DROP TABLE IF EXISTS `product_construction`;
-CREATE TABLE IF NOT EXISTS `product_construction` (
-  `unitId` int(10) UNSIGNED NOT NULL,
-  `price` float UNSIGNED NOT NULL,
-  `access` enum('all','private','list','close') NOT NULL,
-  PRIMARY KEY (`unitId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Дамп данных таблицы `product_construction`
---
-
-INSERT INTO `product_construction` (`unitId`, `price`, `access`) VALUES
-(7, 7, 'all');
 
 -- --------------------------------------------------------
 
@@ -520,14 +503,7 @@ CREATE TABLE IF NOT EXISTS `transport` (
   KEY `unitFrom` (`unitFrom`),
   KEY `unitTo` (`unitTo`),
   KEY `productId` (`productId`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
-
---
--- Дамп данных таблицы `transport`
---
-
-INSERT INTO `transport` (`id`, `productId`, `unitFrom`, `unitTo`, `startTime`, `endTime`) VALUES
-(14, 21, 7, 4, '2020-06-29 08:17:52', '2020-06-29 08:29:52');
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -539,6 +515,7 @@ DROP TABLE IF EXISTS `unit`;
 CREATE TABLE IF NOT EXISTS `unit` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
+  `status` enum('build','work','update','close') NOT NULL DEFAULT 'work',
   `companyId` int(10) UNSIGNED NOT NULL,
   `cityId` int(10) UNSIGNED NOT NULL,
   `typeId` int(10) UNSIGNED NOT NULL,
@@ -547,20 +524,46 @@ CREATE TABLE IF NOT EXISTS `unit` (
   KEY `companyId` (`companyId`),
   KEY `cityId` (`cityId`),
   KEY `typeId` (`typeId`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `unit`
 --
 
-INSERT INTO `unit` (`id`, `title`, `companyId`, `cityId`, `typeId`, `lastUpdate`) VALUES
-(2, 'Первый магазин', 1, 1, 5, '2020-06-26 16:56:55'),
-(3, 'Ларёк', 1, 1, 4, '2020-06-26 17:19:27'),
-(4, 'Средний склад', 1, 4, 7, '2020-06-26 17:33:12'),
-(5, 'Маленький склад', 1, 3, 6, '2020-06-28 08:13:34'),
-(6, 'Нефтяная вышка 1', 1, 5, 1, '2020-06-29 05:47:36'),
-(7, 'Строительное предприятие 1', 1, 1, 12, '2020-06-29 06:28:56'),
-(8, 'Стройка СПБ', 1, 3, 12, '2020-06-29 06:29:25');
+INSERT INTO `unit` (`id`, `title`, `status`, `companyId`, `cityId`, `typeId`, `lastUpdate`) VALUES
+(2, 'Первый магазин', 'work', 1, 1, 5, '2020-06-29 17:50:35'),
+(3, 'Ларёк', 'work', 1, 1, 4, '2020-06-26 17:19:27'),
+(4, 'Средний склад', 'work', 1, 4, 7, '2020-06-26 17:33:12'),
+(5, 'Маленький склад', 'work', 1, 3, 6, '2020-06-28 08:13:34'),
+(6, 'Нефтяная вышка 1', 'work', 1, 5, 1, '2020-06-29 17:50:49'),
+(7, 'Строительное предприятие 1', 'work', 1, 1, 12, '2020-06-29 17:53:47'),
+(8, 'Стройка СПБ', 'work', 1, 3, 12, '2020-06-29 17:50:49'),
+(9, 'Строительная бригада', 'work', 1, 1, 11, '2020-06-29 17:50:49'),
+(11, 'Маленький склад', 'work', 1, 1, 6, '2020-06-29 17:53:47'),
+(12, 'Нефтеперерабатывающий завод', 'build', 1, 1, 2, '2020-06-29 17:53:47');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `unit_construction`
+--
+
+DROP TABLE IF EXISTS `unit_construction`;
+CREATE TABLE IF NOT EXISTS `unit_construction` (
+  `unitId` int(10) UNSIGNED NOT NULL,
+  `price` float UNSIGNED NOT NULL,
+  `access` enum('all','private','list','close') NOT NULL,
+  PRIMARY KEY (`unitId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `unit_construction`
+--
+
+INSERT INTO `unit_construction` (`unitId`, `price`, `access`) VALUES
+(7, 9, 'all'),
+(8, 0, 'close'),
+(9, 8, 'all');
 
 -- --------------------------------------------------------
 
@@ -570,14 +573,23 @@ INSERT INTO `unit` (`id`, `title`, `companyId`, `cityId`, `typeId`, `lastUpdate`
 
 DROP TABLE IF EXISTS `unit_making`;
 CREATE TABLE IF NOT EXISTS `unit_making` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `unitId` int(10) UNSIGNED NOT NULL,
-  `makeId` int(11) NOT NULL,
+  `makeId` int(10) UNSIGNED NOT NULL,
   `makingPrice` float UNSIGNED NOT NULL,
   `remaindCost` float NOT NULL,
   `quality` float UNSIGNED NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  PRIMARY KEY (`id`),
+  KEY `makeId` (`makeId`),
+  KEY `unitId` (`unitId`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `unit_making`
+--
+
+INSERT INTO `unit_making` (`id`, `unitId`, `makeId`, `makingPrice`, `remaindCost`, `quality`) VALUES
+(3, 7, 12, 45000, 5000, 1);
 
 -- --------------------------------------------------------
 
@@ -588,6 +600,7 @@ CREATE TABLE IF NOT EXISTS `unit_making` (
 DROP TABLE IF EXISTS `unit_sale`;
 CREATE TABLE IF NOT EXISTS `unit_sale` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `type` enum('sale','shop','build','') NOT NULL DEFAULT 'sale',
   `unitFrom` int(10) UNSIGNED DEFAULT NULL,
   `unitTo` int(10) UNSIGNED DEFAULT NULL,
   `productType` int(10) UNSIGNED NOT NULL,
@@ -600,23 +613,26 @@ CREATE TABLE IF NOT EXISTS `unit_sale` (
   KEY `productType` (`productType`),
   KEY `unitFrom` (`unitFrom`),
   KEY `unitTo` (`unitTo`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `unit_sale`
 --
 
-INSERT INTO `unit_sale` (`id`, `unitFrom`, `unitTo`, `productType`, `valueFrom`, `valueTo`, `amount`, `quality`, `date`) VALUES
-(6, 4, 2, 2, 25, -25, 5, 2, '2020-06-28 10:01:54'),
-(7, 4, 2, 2, 50, -50, 10, 2, '2020-06-28 10:03:44'),
-(8, 4, 2, 2, 25, -25, 5, 2, '2020-06-28 10:20:30'),
-(9, 4, 2, 2, 50, -50, 10, 2, '2020-06-28 10:22:55'),
-(10, 5, 2, 2, 100, -100, 10, 3, '2020-06-28 10:26:48'),
-(11, 5, 2, 2, 10, -10, 1, 3, '2020-06-28 10:27:16'),
-(12, 4, 2, 2, 35, -35, 7, 2, '2020-06-28 11:50:20'),
-(13, 4, 2, 2, 50, -50, 10, 2, '2020-06-28 11:50:43'),
-(14, 2, NULL, 3, 10000, 0, 100, 3, '2020-06-28 13:49:24'),
-(15, 4, 7, 14, 50000, -50000, 10000, 1, '2020-06-29 06:46:26');
+INSERT INTO `unit_sale` (`id`, `type`, `unitFrom`, `unitTo`, `productType`, `valueFrom`, `valueTo`, `amount`, `quality`, `date`) VALUES
+(6, 'sale', 4, 2, 2, 25, -25, 5, 2, '2020-06-28 10:01:54'),
+(7, 'sale', 4, 2, 2, 50, -50, 10, 2, '2020-06-28 10:03:44'),
+(8, 'sale', 4, 2, 2, 25, -25, 5, 2, '2020-06-28 10:20:30'),
+(9, 'sale', 4, 2, 2, 50, -50, 10, 2, '2020-06-28 10:22:55'),
+(10, 'sale', 5, 2, 2, 100, -100, 10, 3, '2020-06-28 10:26:48'),
+(11, 'sale', 5, 2, 2, 10, -10, 1, 3, '2020-06-28 10:27:16'),
+(12, 'sale', 4, 2, 2, 35, -35, 7, 2, '2020-06-28 11:50:20'),
+(13, 'sale', 4, 2, 2, 50, -50, 10, 2, '2020-06-28 11:50:43'),
+(14, 'sale', 2, NULL, 3, 10000, 0, 100, 3, '2020-06-28 13:49:24'),
+(15, 'sale', 4, 7, 14, 50000, -50000, 10000, 1, '2020-06-29 06:46:26'),
+(16, 'sale', 4, 9, 14, 20000, -20000, 4000, 1, '2020-06-29 13:46:47'),
+(17, 'build', 7, 11, 14, 1800, -1800, 200, 1, '2020-06-29 17:47:49'),
+(18, 'build', 7, 12, 14, 45000, -45000, 5000, 1, '2020-06-29 17:53:47');
 
 -- --------------------------------------------------------
 
@@ -692,7 +708,7 @@ CREATE TABLE IF NOT EXISTS `visit` (
   `refer` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `user_id` (`userId`)
-) ENGINE=InnoDB AUTO_INCREMENT=1102 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1337 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `visit`
@@ -1766,7 +1782,230 @@ INSERT INTO `visit` (`id`, `date`, `page`, `userId`, `refer`) VALUES
 (1098, '2020-06-29 12:05:46', 'unit', 1, 'http://eg.game/unit&id=7&tab=construction'),
 (1099, '2020-06-29 12:05:48', 'unit', 1, 'http://eg.game/unit&id=7&tab=supply'),
 (1100, '2020-06-29 12:05:50', 'units', 1, 'http://eg.game/unit&id=7&tab=construction'),
-(1101, '2020-06-29 12:05:53', 'create_unit', 1, 'http://eg.game/units');
+(1101, '2020-06-29 12:05:53', 'create_unit', 1, 'http://eg.game/units'),
+(1102, '2020-06-29 12:24:40', 'index', NULL, ''),
+(1103, '2020-06-29 12:24:45', 'login', NULL, 'http://eg.game/'),
+(1104, '2020-06-29 12:26:04', 'login', NULL, 'http://eg.game/login'),
+(1105, '2020-06-29 12:26:09', 'units', 1, 'http://eg.game/login'),
+(1106, '2020-06-29 12:51:18', 'unit', 1, 'http://eg.game/units'),
+(1107, '2020-06-29 12:51:19', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1108, '2020-06-29 12:52:17', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1109, '2020-06-29 12:52:26', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1110, '2020-06-29 12:54:07', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1111, '2020-06-29 12:54:33', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1112, '2020-06-29 12:54:38', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1113, '2020-06-29 12:56:57', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1114, '2020-06-29 12:58:25', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1115, '2020-06-29 12:59:00', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1116, '2020-06-29 12:59:15', 'unit', 1, 'http://eg.game/unit&id=7&tab=construction'),
+(1117, '2020-06-29 12:59:16', 'unit', 1, 'http://eg.game/unit&id=7&tab=supply'),
+(1118, '2020-06-29 12:59:17', 'unit', 1, 'http://eg.game/unit&id=7&tab=info'),
+(1119, '2020-06-29 12:59:21', 'unit', 1, 'http://eg.game/unit&id=7&tab=supply'),
+(1120, '2020-06-29 13:06:35', 'unit', 1, 'http://eg.game/unit&id=7&tab=supply'),
+(1121, '2020-06-29 13:27:38', 'units', 1, 'http://eg.game/unit&id=7&tab=construction'),
+(1122, '2020-06-29 13:27:44', 'create_unit', 1, 'http://eg.game/units'),
+(1124, '2020-06-29 13:30:09', 'select_builder', 1, ''),
+(1125, '2020-06-29 13:30:36', 'select_builder', 1, ''),
+(1126, '2020-06-29 13:30:53', 'select_builder', 1, ''),
+(1130, '2020-06-29 13:34:45', 'select_builder', 1, ''),
+(1131, '2020-06-29 13:35:28', 'select_builder', 1, ''),
+(1132, '2020-06-29 13:35:45', 'select_builder', 1, ''),
+(1133, '2020-06-29 13:36:09', 'select_builder', 1, ''),
+(1134, '2020-06-29 13:36:27', 'select_builder', 1, ''),
+(1135, '2020-06-29 15:20:01', 'login', NULL, ''),
+(1136, '2020-06-29 15:20:06', 'login', NULL, 'http://eg.game/select_builder&city_id=1&unit_type=5'),
+(1137, '2020-06-29 15:21:02', 'units', 1, 'http://eg.game/login'),
+(1138, '2020-06-29 15:21:06', 'create_unit', 1, 'http://eg.game/units'),
+(1139, '2020-06-29 15:22:39', 'create_unit', 1, 'http://eg.game/units'),
+(1140, '2020-06-29 15:22:41', 'create_unit', 1, 'http://eg.game/units'),
+(1141, '2020-06-29 15:23:55', 'create_unit', 1, 'http://eg.game/units'),
+(1142, '2020-06-29 15:23:57', 'create_unit', 1, 'http://eg.game/units'),
+(1143, '2020-06-29 15:24:12', 'create_unit', 1, 'http://eg.game/units'),
+(1144, '2020-06-29 15:25:20', 'create_unit', 1, 'http://eg.game/units'),
+(1145, '2020-06-29 15:25:43', 'create_unit', 1, 'http://eg.game/units'),
+(1146, '2020-06-29 15:25:59', 'create_unit', 1, 'http://eg.game/units'),
+(1147, '2020-06-29 15:26:15', 'create_unit', 1, 'http://eg.game/units'),
+(1148, '2020-06-29 15:26:29', 'create_unit', 1, 'http://eg.game/units'),
+(1149, '2020-06-29 15:31:45', 'create_unit', 1, 'http://eg.game/units'),
+(1150, '2020-06-29 15:31:47', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1151, '2020-06-29 15:32:28', 'create_unit', 1, 'http://eg.game/units'),
+(1152, '2020-06-29 15:32:40', 'create_unit', 1, 'http://eg.game/units'),
+(1153, '2020-06-29 15:32:40', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1154, '2020-06-29 15:32:54', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1155, '2020-06-29 15:32:57', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1156, '2020-06-29 15:33:45', 'create_unit', 1, 'http://eg.game/units'),
+(1157, '2020-06-29 15:33:46', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1158, '2020-06-29 15:36:55', 'units', 1, 'http://eg.game/create_unit&type=factory'),
+(1159, '2020-06-29 15:36:58', 'unit', 1, 'http://eg.game/units'),
+(1160, '2020-06-29 15:38:00', 'units', 1, 'http://eg.game/create_unit&type=factory'),
+(1161, '2020-06-29 15:38:03', 'unit', 1, 'http://eg.game/units'),
+(1162, '2020-06-29 15:38:14', 'create_unit', 1, 'http://eg.game/units'),
+(1163, '2020-06-29 15:38:14', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1164, '2020-06-29 15:38:50', 'create_unit', 1, 'http://eg.game/units'),
+(1165, '2020-06-29 15:38:50', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1166, '2020-06-29 15:38:58', 'create_unit', 1, 'http://eg.game/units'),
+(1167, '2020-06-29 15:38:58', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1168, '2020-06-29 15:38:58', 'create_unit', 1, 'http://eg.game/units'),
+(1169, '2020-06-29 15:38:59', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1170, '2020-06-29 15:40:06', 'create_unit', 1, 'http://eg.game/units'),
+(1171, '2020-06-29 15:40:06', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1172, '2020-06-29 15:40:17', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1173, '2020-06-29 15:40:18', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1174, '2020-06-29 15:41:21', 'create_unit', 1, 'http://eg.game/units'),
+(1175, '2020-06-29 15:41:21', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1176, '2020-06-29 15:41:23', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1177, '2020-06-29 15:41:25', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1178, '2020-06-29 15:42:11', 'create_unit', 1, 'http://eg.game/units'),
+(1179, '2020-06-29 15:42:11', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1180, '2020-06-29 15:42:50', 'create_unit', 1, 'http://eg.game/units'),
+(1181, '2020-06-29 15:42:50', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1182, '2020-06-29 15:42:52', 'create_unit', 1, 'http://eg.game/units'),
+(1183, '2020-06-29 15:42:52', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1184, '2020-06-29 15:43:25', 'create_unit', 1, 'http://eg.game/units'),
+(1185, '2020-06-29 15:43:25', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1186, '2020-06-29 15:43:54', 'create_unit', 1, 'http://eg.game/units'),
+(1187, '2020-06-29 15:43:55', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1188, '2020-06-29 15:44:04', 'create_unit', 1, 'http://eg.game/units'),
+(1189, '2020-06-29 15:44:04', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1190, '2020-06-29 15:45:13', 'create_unit', 1, 'http://eg.game/units'),
+(1191, '2020-06-29 15:45:13', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1192, '2020-06-29 15:46:19', 'create_unit', 1, 'http://eg.game/units'),
+(1193, '2020-06-29 15:46:19', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1194, '2020-06-29 15:46:22', 'create_unit', 1, 'http://eg.game/units'),
+(1195, '2020-06-29 15:46:23', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1196, '2020-06-29 15:46:29', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1197, '2020-06-29 15:46:37', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1198, '2020-06-29 15:46:38', 'units', 1, 'http://eg.game/create_unit&type=factory'),
+(1199, '2020-06-29 15:46:39', 'create_unit', 1, 'http://eg.game/units'),
+(1200, '2020-06-29 15:46:40', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1201, '2020-06-29 15:46:41', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1202, '2020-06-29 15:46:43', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1203, '2020-06-29 15:46:46', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1204, '2020-06-29 15:47:17', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1205, '2020-06-29 15:47:24', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1206, '2020-06-29 16:45:17', 'login', NULL, 'http://eg.game/units'),
+(1207, '2020-06-29 16:45:23', 'login', NULL, 'http://eg.game/create_unit&type=storage'),
+(1208, '2020-06-29 16:45:26', 'login', NULL, 'http://eg.game/login'),
+(1209, '2020-06-29 16:45:27', 'units', 1, 'http://eg.game/login'),
+(1210, '2020-06-29 16:45:28', 'unit', 1, 'http://eg.game/units'),
+(1211, '2020-06-29 16:45:31', 'units', 1, 'http://eg.game/unit&id=4'),
+(1212, '2020-06-29 16:45:32', 'create_unit', 1, 'http://eg.game/units'),
+(1213, '2020-06-29 16:45:32', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1214, '2020-06-29 16:45:35', 'units', 1, 'http://eg.game/unit&id=4'),
+(1215, '2020-06-29 16:45:37', 'create_unit', 1, 'http://eg.game/units'),
+(1216, '2020-06-29 16:45:37', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1217, '2020-06-29 16:45:55', 'create_unit', 1, 'http://eg.game/units'),
+(1218, '2020-06-29 16:45:55', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1219, '2020-06-29 16:45:59', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1220, '2020-06-29 16:46:01', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1221, '2020-06-29 16:46:10', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1222, '2020-06-29 16:46:15', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1223, '2020-06-29 16:46:16', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1224, '2020-06-29 16:46:23', 'units', 1, 'http://eg.game/create_unit&type=storage'),
+(1225, '2020-06-29 16:46:27', 'create_unit', 1, 'http://eg.game/units'),
+(1226, '2020-06-29 16:46:27', 'select_builder', 1, 'http://eg.game/create_unit&type=construction'),
+(1227, '2020-06-29 16:46:34', 'create_unit', 1, 'http://eg.game/create_unit&type=construction'),
+(1228, '2020-06-29 16:46:34', 'units', 1, 'http://eg.game/create_unit&type=construction'),
+(1229, '2020-06-29 16:46:37', 'unit', 1, 'http://eg.game/units'),
+(1230, '2020-06-29 16:46:37', 'unit', 1, 'http://eg.game/unit&id=9'),
+(1231, '2020-06-29 16:46:39', 'add_supply', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1232, '2020-06-29 16:46:47', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1233, '2020-06-29 16:51:23', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1234, '2020-06-29 16:51:24', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1235, '2020-06-29 16:54:25', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1236, '2020-06-29 17:00:56', 'units', 1, 'http://eg.game/unit&id=2'),
+(1237, '2020-06-29 17:00:59', 'create_unit', 1, 'http://eg.game/units'),
+(1238, '2020-06-29 17:00:59', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1239, '2020-06-29 17:01:01', 'units', 1, 'http://eg.game/create_unit&type=storage'),
+(1240, '2020-06-29 17:01:07', 'unit', 1, 'http://eg.game/units'),
+(1241, '2020-06-29 17:01:09', 'unit', 1, 'http://eg.game/unit&id=9'),
+(1242, '2020-06-29 17:01:11', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1243, '2020-06-29 17:01:24', 'unit', 1, 'http://eg.game/unit&id=9&tab=construction'),
+(1244, '2020-06-29 17:01:26', 'units', 1, 'http://eg.game/unit&id=9&tab=construction'),
+(1245, '2020-06-29 17:01:27', 'unit', 1, 'http://eg.game/units'),
+(1246, '2020-06-29 17:01:28', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1247, '2020-06-29 17:01:32', 'unit', 1, 'http://eg.game/unit&id=7&tab=construction'),
+(1248, '2020-06-29 17:01:33', 'units', 1, 'http://eg.game/unit&id=7&tab=construction'),
+(1249, '2020-06-29 17:01:38', 'create_unit', 1, 'http://eg.game/units'),
+(1250, '2020-06-29 17:01:38', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1251, '2020-06-29 17:01:40', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1252, '2020-06-29 17:01:42', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1253, '2020-06-29 17:01:49', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1254, '2020-06-29 17:01:50', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1255, '2020-06-29 17:01:52', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1258, '2020-06-29 17:02:57', 'create_unit', 1, 'http://eg.game/units'),
+(1259, '2020-06-29 17:02:57', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1260, '2020-06-29 17:02:58', 'create_unit', 1, 'http://eg.game/units'),
+(1261, '2020-06-29 17:02:58', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1263, '2020-06-29 17:03:06', 'create_unit', 1, 'http://eg.game/units'),
+(1264, '2020-06-29 17:03:06', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1266, '2020-06-29 17:03:17', 'create_unit', 1, 'http://eg.game/units'),
+(1267, '2020-06-29 17:03:17', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1268, '2020-06-29 17:03:51', 'create_unit', 1, 'http://eg.game/units'),
+(1269, '2020-06-29 17:03:51', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1270, '2020-06-29 17:03:59', 'create_unit', 1, 'http://eg.game/units'),
+(1271, '2020-06-29 17:04:00', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1272, '2020-06-29 17:04:12', 'create_unit', 1, 'http://eg.game/units'),
+(1273, '2020-06-29 17:04:12', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1274, '2020-06-29 17:04:26', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1275, '2020-06-29 17:04:27', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1276, '2020-06-29 17:04:28', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1277, '2020-06-29 17:12:35', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1278, '2020-06-29 17:16:26', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1279, '2020-06-29 17:16:27', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1280, '2020-06-29 17:16:27', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1281, '2020-06-29 17:16:27', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1282, '2020-06-29 17:16:50', 'unit', 1, 'http://eg.game/unit&id=9&tab=supply'),
+(1283, '2020-06-29 17:18:29', 'create_unit', 1, 'http://eg.game/units'),
+(1285, '2020-06-29 17:19:22', 'create_unit', 1, 'http://eg.game/units'),
+(1287, '2020-06-29 17:20:44', 'create_unit', 1, 'http://eg.game/units'),
+(1289, '2020-06-29 17:22:04', 'create_unit', 1, 'http://eg.game/units'),
+(1290, '2020-06-29 17:22:05', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1291, '2020-06-29 17:22:32', 'create_unit', 1, 'http://eg.game/units'),
+(1292, '2020-06-29 17:22:32', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1293, '2020-06-29 17:23:19', 'create_unit', 1, 'http://eg.game/units'),
+(1294, '2020-06-29 17:23:19', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1295, '2020-06-29 17:23:27', 'create_unit', 1, 'http://eg.game/create_unit&type=storage'),
+(1296, '2020-06-29 17:23:27', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1297, '2020-06-29 20:18:37', 'login', NULL, 'http://eg.game/create_unit&type=storage'),
+(1298, '2020-06-29 20:18:43', 'login', NULL, 'http://eg.game/create_unit'),
+(1299, '2020-06-29 20:18:47', 'units', 1, 'http://eg.game/login'),
+(1300, '2020-06-29 20:18:49', 'unit', 1, 'http://eg.game/units'),
+(1301, '2020-06-29 20:18:51', 'unit', 1, 'http://eg.game/unit&id=7'),
+(1302, '2020-06-29 20:18:52', 'unit', 1, 'http://eg.game/unit&id=7&tab=construction'),
+(1303, '2020-06-29 20:18:52', 'unit', 1, 'http://eg.game/unit&id=7&tab=supply'),
+(1304, '2020-06-29 20:18:54', 'unit', 1, 'http://eg.game/unit&id=7&tab=info'),
+(1305, '2020-06-29 20:18:57', 'units', 1, 'http://eg.game/unit&id=7&tab=construction'),
+(1306, '2020-06-29 20:44:18', 'create_unit', 1, 'http://eg.game/units'),
+(1307, '2020-06-29 20:44:18', 'select_builder', 1, 'http://eg.game/create_unit&type=storage'),
+(1308, '2020-06-29 20:44:33', 'create_unit', 1, 'http://eg.game/create_unit&type=storage'),
+(1309, '2020-06-29 20:44:33', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1310, '2020-06-29 20:44:39', 'create_unit', 1, 'http://eg.game/create_unit'),
+(1311, '2020-06-29 20:44:39', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1312, '2020-06-29 20:45:47', 'create_unit', 1, 'http://eg.game/create_unit'),
+(1313, '2020-06-29 20:45:48', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1314, '2020-06-29 20:46:00', 'create_unit', 1, 'http://eg.game/create_unit'),
+(1315, '2020-06-29 20:46:01', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1316, '2020-06-29 20:46:17', 'create_unit', 1, 'http://eg.game/create_unit'),
+(1317, '2020-06-29 20:46:17', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1318, '2020-06-29 20:46:43', 'create_unit', 1, 'http://eg.game/create_unit'),
+(1319, '2020-06-29 20:46:44', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1320, '2020-06-29 20:46:48', 'create_unit', 1, 'http://eg.game/create_unit'),
+(1321, '2020-06-29 20:46:49', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1322, '2020-06-29 20:46:57', 'create_unit', 1, 'http://eg.game/create_unit'),
+(1323, '2020-06-29 20:46:57', 'select_builder', 1, 'http://eg.game/create_unit'),
+(1325, '2020-06-29 20:47:49', 'create_unit', 1, 'http://eg.game/create_unit'),
+(1326, '2020-06-29 20:47:49', 'units', 1, 'http://eg.game/create_unit'),
+(1327, '2020-06-29 20:51:06', 'unit', 1, 'http://eg.game/units'),
+(1328, '2020-06-29 20:51:08', 'unit', 1, 'http://eg.game/unit&id=11'),
+(1329, '2020-06-29 20:51:09', 'unit', 1, 'http://eg.game/unit&id=11&tab=supply'),
+(1330, '2020-06-29 20:51:14', 'units', 1, 'http://eg.game/unit&id=11&tab=info'),
+(1331, '2020-06-29 20:53:25', 'create_unit', 1, 'http://eg.game/units'),
+(1332, '2020-06-29 20:53:26', 'select_builder', 1, 'http://eg.game/create_unit&type=factory'),
+(1333, '2020-06-29 20:53:47', 'create_unit', 1, 'http://eg.game/create_unit&type=factory'),
+(1334, '2020-06-29 20:53:47', 'units', 1, 'http://eg.game/create_unit&type=factory'),
+(1335, '2020-06-29 20:53:52', 'unit', 1, 'http://eg.game/units'),
+(1336, '2020-06-29 20:54:40', 'unit', 1, 'http://eg.game/units');
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -1867,6 +2106,13 @@ ALTER TABLE `unit`
   ADD CONSTRAINT `unit_ibfk_1` FOREIGN KEY (`companyId`) REFERENCES `company` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `unit_ibfk_2` FOREIGN KEY (`cityId`) REFERENCES `city` (`id`),
   ADD CONSTRAINT `unit_ibfk_3` FOREIGN KEY (`typeId`) REFERENCES `unit_type` (`id`);
+
+--
+-- Ограничения внешнего ключа таблицы `unit_making`
+--
+ALTER TABLE `unit_making`
+  ADD CONSTRAINT `unit_making_ibfk_1` FOREIGN KEY (`makeId`) REFERENCES `unit` (`id`),
+  ADD CONSTRAINT `unit_making_ibfk_2` FOREIGN KEY (`unitId`) REFERENCES `unit` (`id`);
 
 --
 -- Ограничения внешнего ключа таблицы `unit_sale`

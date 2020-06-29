@@ -22,7 +22,7 @@ a {
 h1 {
 	text-align: center;
 }
-h3 {
+h3, h4 {
 	text-align: center;
 	margin: 0.5em 0;
 }
@@ -37,12 +37,13 @@ h3 {
 	padding: 0.5em 0;
 }
 .data-form {
-	width: 40em;
-	margin-left: calc(50% - 20em);
+	width: 60em;
+	margin-left: calc(50% - 30em);
 	margin-top: 20px;
 	text-align: center;
 	padding: 1em 2em;
 	box-shadow: 1px 1px 2px 1px grey;
+	background-color: #eeeeee;
 }
 .data-form input[type=text], .data-form input[type=number],.data-form input[type=password], .data-form select {
 	width: 30em;
@@ -166,6 +167,30 @@ h3 {
 	border-style: dashed;
 	padding: 7px 15px;
 	min-width: 15em;
+	text-align: center;
+}
+/**
+Страница создания предприятия
+ */
+#create-unit-form {
+	text-align: left;
+	width: 90vw;
+	margin-left: 5vw;
+}
+#create-unit-form select, #create-unit-form input[type=text] {
+	float: right;
+}
+.select-builder-form {
+	border-style: solid;
+	border-width: 1px;
+	border-color: #777777;
+}
+.select-builder-form th {
+	background-color: #9eb8df;
+	padding: 2px 0;
+	text-align: center;
+}
+.select-builder-form td {
 	text-align: center;
 }
 /**

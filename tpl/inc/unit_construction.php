@@ -1,11 +1,11 @@
 <div class="data-line">Производительность в час <?=$data['construction']['make']?></div>
-<div class="data-line">В наличии стройматериалов <?=$data['construction']['amount']?></div>
-<div class="data-line">Свободно стройматериалов <?=$data['construction']['freeAmount']?>
-<?if ($data['construction']['freeAmount'] >=1):?>
-    <input style="margin-left: 10px;" class="select-supply-count" type="number" value="0" min="0" max="<?=$data['construction']['freeAmount']?>">
-    <a class="do-unload" data-type-id="<?=CONSTRUCTION_MATERIAL?>" href="#this">Выгрузить</a>
-<?endif;?>
+<div class="data-line">В наличии стройматериалов <?=$data['construction']['amount']?>
+    <?if ($data['construction']['amount'] >=1):?>
+        <input style="margin-left: 10px;" class="select-supply-count" type="number" value="0" min="0" max="<?=$data['construction']['amount']?>">
+        <a class="do-unload" data-type-id="<?=CONSTRUCTION_MATERIAL?>" href="#this">Выгрузить</a>
+    <?endif;?>
 </div>
+<div class="data-line">Использовано в строительстве <?=$data['construction']['queueAmount']?></div>
 <div class="data-line">
 <form action="/unit&id=<?=$data['unit']['id']?>&tab=construction" method="post">
     <input type="hidden" name="action" value="update_construction">

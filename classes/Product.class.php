@@ -122,7 +122,8 @@ class Product extends Base {
         $this->amount -= $amount;
         $this->unit->company->money += $price*$amount;
         MyDB::insert("unit_sale",
-            ['unitFrom' => $this->unit->id,
+            [   'type' => 'shop',
+                'unitFrom' => $this->unit->id,
                 'unitTo' => 'NULL',
                 'productType' => $this->type->id,
                 'valueFrom' => $price*$amount,
@@ -175,7 +176,8 @@ class Product extends Base {
         $amountFrom = $amount*$saleData['price'];
         $amountTo = -1*$amount*$saleData['price'];
         MyDB::insert('unit_sale',
-            ['unitFrom' => $this->unit->id,
+            ['type' => 'sale',
+            'unitFrom' => $this->unit->id,
             'unitTo' => $unitTo->id,
             'productType' => $this->type->id,
             'valueFrom' => $amountFrom,

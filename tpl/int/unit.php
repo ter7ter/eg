@@ -9,6 +9,7 @@
             <a href="/unit&id=<?=$data['unit']['id']?>&tab=info">Информация</a>
         </div>
         <?endif;?>
+    <?if ($data['unit']['status'] == 'work'):?>
         <?if (in_array('supply', UnitType::$_UNIT_TABS[$data['unit']['type']['type']])):?>
         <div class="tab<?=($tab=='supply')?' active':''?>">
             <a href="/unit&id=<?=$data['unit']['id']?>&tab=supply">Снабжение</a>
@@ -39,6 +40,7 @@
                 <a href="/unit&id=<?=$data['unit']['id']?>&tab=construction">Строительство</a>
             </div>
         <?endif;?>
+    <?endif;?>
     </div>
     <tr class="unit-tab">
     <?include("tpl/inc/unit_{$tab}.php");?>

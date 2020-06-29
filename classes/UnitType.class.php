@@ -43,6 +43,11 @@ class UnitType extends Base {
     ];
 
     /**
+     * @var float|null
+     */
+    public $buildPerformance = null;
+
+    /**
      * @param $id
      * @return UnitType|bool
      * @throws Exception
@@ -54,6 +59,10 @@ class UnitType extends Base {
 
     public function __construct($data) {
         parent::__construct($data);
+        if ($this->type == 'construction') {
+            $this->buildPerformance = MyDB::query("SELECT amount FROM production_cost WHERE unitType = ?id", ['id' => $this->id], 'elem');
+            $this->buildPerformance = $this->buildPerformance/3600;
+        }
     }
 
     public function save() {

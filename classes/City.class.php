@@ -47,7 +47,7 @@ class City extends Base {
     }
 
     public static function get_builder_query() {
-        $query = " unit_type.cost, product.amount, sum(unit_making.remaindCost) as amountBusy  FROM unit 
+        $query = " FROM unit 
             INNER JOIN unit_type ON unit_type.id = unit.typeId
             INNER JOIN unit_construction ON unit_construction.unitId = unit.id
             INNER JOIN product ON product.unitId = unit.id
@@ -55,9 +55,8 @@ class City extends Base {
             LEFT JOIN unit_making ON unit_making.unitId = unit.id
             WHERE unit_type.type = 'construction' AND unit.cityId = ?city_id AND 
             (unit_construction.access = 'all' OR (unit_construction.access = 'private' AND unit.companyId = ?company_id)) AND
-            product.typeId = ".CONSTRUCTION_MATERIAL." AND production_cost.productType = ".CONSTRUCTION_MATERIAL." 
-            GROUP BY unit.id 
-            HAVING (amountBusy + unit_type.cost <= product.amount) OR (amountBusy IS NULL AND unit_type.cost <= product.amount)";
+            product.typeId = ".CONSTRUCTION_MATERIAL." AND production_cost.productType = ".CONSTRUCTION_MATERIAL." AND
+            ?cost <= product.amount GROUP BY unit.id";
         return $query;
     }
 
@@ -73,7 +72,7 @@ class City extends Base {
     public function get_builder_list($unitType, $company, $order = [], $start = 0, $limit = false) {
         $query = "SELECT unit.id as unitId, unit.companyId,
             unit_construction.price, unit_construction.access, production_cost.amount as performance,
-            product.quality,".City::get_builder_query();
+            product.quality, product.amount, sum(unit_making.remaindCost) as amountBusy ".City::get_builder_query();
         if (count($order)) {
             $orderField = array_key_first($order);
             $orderDirection = $order[$orderField];
@@ -86,7 +85,7 @@ class City extends Base {
             $query .= " LIMIT ?start, ?limit";
         }
         $rows = MyDB::query($query,
-            ['city_id' => $this->id, 'order' => $orderField, 'company_id' => $company->id, 'direction' => $orderDirection, 'start' => $start, 'limit' => $limit]);
+            ['city_id' => $this->id, 'order' => $orderField, 'cost' => $unitType->cost, 'company_id' => $company->id, 'direction' => $orderDirection, 'start' => $start, 'limit' => $limit]);
         $result = [];
         foreach ($rows as $row) {
             $row['company'] = Company::get($row['companyId']);
@@ -97,7 +96,7 @@ class City extends Base {
     }
 
     public function get_builder_list_count($unitType, $company) {
-        $query = "SELECT ".City::get_builder_query();
-        return MyDB::query($query, ['city_id' => $this->id, 'company_id' => $company->id], 'num_rows');
+        $query = "SELECT count(*) ".City::get_builder_query();
+        return MyDB::query($query, ['city_id' => $this->id, 'company_id' => $company->id, 'cost' => $unitType->cost], 'elem');
     }
 }

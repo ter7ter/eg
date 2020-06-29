@@ -14,6 +14,12 @@ function create_company_page() {
 }
 
 function create_unit_page() {
+    function open_select_buider() {
+        $.post('/select_builder', {'city_id': $('#unit-select-city').val(), 'unit_type': $('#unit-select-type').val()}, function (data) {
+            $('#builder-window').html(data);
+        });
+    }
+
     $('#unit-select-country').change(function () {
         $.getJSON('/get_regions&json=1&id=' + $('#unit-select-country').val(), function (response) {
             if (response.status == 'ok') {
@@ -21,6 +27,7 @@ function create_unit_page() {
                 for (var i in response.data.regions) {
                     $('#unit-select-region').append('<option value="'+response.data.regions[i].id+'">'+response.data.regions[i].title+'</option>')
                 }
+                $('#unit-select-region').change();
             } else {
                 window.alert('Ошибка: ' + response.error);
             }
@@ -33,10 +40,14 @@ function create_unit_page() {
                 for (var i in response.data.cities) {
                     $('#unit-select-city').append('<option value="'+response.data.cities[i].id+'">'+response.data.cities[i].title+'</option>')
                 }
+                $('#unit-select-city').change();
             } else {
                 window.alert('Ошибка: ' + response.error);
             }
         })
+    });
+    $('#unit-select-city').change(function () {
+        open_select_buider();
     });
     $('input[name=title]').change(function () {
         $(this).attr('data-changed', 1);
@@ -45,7 +56,9 @@ function create_unit_page() {
         if ($('input[name=title]').attr('data-changed') == '0') {
             $('input[name=title]').val($('#unit-select-type :selected').text());
         }
+        open_select_buider();
     });
+    open_select_buider();
 }
 
 function unit_page() {
@@ -85,7 +98,7 @@ function unit_page() {
             'amount': amount
         };
         $.post('/add_supply&json=1', vars, function (data) {
-            response = $.parseJSON(data);
+            var response = $.parseJSON(data);
             if (response.status == 'ok') {
                 window.location.reload();
             } else {

@@ -24,12 +24,10 @@ if (!$error) {
         $data['builders'][] = [
             'unit' => $item['unit']->get_info(),
             'company' => $item['unit']->company->get_info(),
-            'city' => $item['unit']->city->get_info(),
-            'price' => $item['price'] * $item['cost'],
-            'buildTime' => round($item['cost'] * 3600 / $item['performance']),
+            'price' => $item['price'] * $unitType->cost,
+            'buildTime' => round($unitType->cost * 3600 / $item['performance']),
             'waitTime' => round($item['amountBusy'] * 3600 / $item['performance']),
             'amount' => $item['amount'] - $item['amountBusy'],
-            'cost' => $item['cost']
         ];
     }
 } else {
