@@ -102,6 +102,29 @@ class Unit extends Base {
         return $result;
     }
 
+    public function get_product_supply() {
+        if (in_array($this->type, ['shop', 'storage'])) {
+            return $this->get_products();
+        } else {
+            $result = [];
+            $needProducts = $this->type->get_product_cost();
+            foreach ($needProducts as $need) {
+                $product = $this->get_product_by_type(ProductType::get($need['productType']));
+                if (!$product) {
+                    $product = new Product([
+                        'typeId' => $need['productType'],
+                        'amount' => 0,
+                        'quality' => 0,
+                        'unitId' => $this->id
+                    ]);
+                    $product->save();
+                }
+                $result[] = $product;
+            }
+            return $result;
+        }
+    }
+
     /**
      * Список товаров, которые стоят на сбыт
      * @return array
@@ -122,23 +145,6 @@ class Unit extends Base {
         return MyDB::query("SELECT typeId, price FROM product_shop WHERE unitId = ?unit_id", ['unit_id' => $this->id]);
     }
 
-    /**
-     * Список что тут производится
-     * @return array
-     * @throws Exception
-     */
-    public function get_product_making() {
-        return MyDB::query("SELECT * FROM production_making WHERE unitType = ?unit_type_id", ['unit_type_id' => $this->type->id]);
-    }
-
-    /**
-     * Список того, что требуется для производства
-     * @return array
-     * @throws Exception
-     */
-    public function get_product_cost() {
-        return MyDB::query("SELECT * FROM production_cost WHERE unitType = ?unit_type_id", ['unit_type_id' => $this->type->id]);
-    }
 
     /**
      * @param ProductType $type
@@ -221,6 +227,10 @@ class Unit extends Base {
                                 'unitId' => $this->id]);
                         $product->save();
                     }
+                    foreach ($costs as $cost) {
+                        $products[$cost['productType']]->amount -= $cost['amount'] * $time * $production;
+                        $products[$cost['productType']]->save();
+                    }
                 }
             }
             $this->lastUpdate = timestamp_to_db($nowTime);
@@ -285,6 +295,10 @@ class Unit extends Base {
         if (!in_array($access, ['all', 'private', 'list', 'close'])) {
             $access = 'close';
         }
+        if ($price <= 0) {
+            $price = 0;
+            $access = 'close';
+        }
         MyDB::query("INSERT INTO product_sale 
             SET unitId = ?unit_id, typeId = ?type_id, price = '?price', access = '?access', currencyId = ?currency_id
             ON DUPLICATE KEY UPDATE price = '?price', access = '?access', currencyId = ?currency_id",
@@ -298,6 +312,9 @@ class Unit extends Base {
      */
     public function update_shop_price($typeId, $price) {
         $price = floatval($price);
+        if ($price < 0) {
+            $price = 0;
+        }
         MyDB::query("INSERT INTO product_shop 
             SET unitId = ?unit_id, typeId = ?type_id, price = '?price', cityId = ?city_id, shopFactor = 0
             ON DUPLICATE KEY UPDATE price = '?price'",

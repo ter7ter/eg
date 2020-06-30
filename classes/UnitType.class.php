@@ -30,7 +30,7 @@ class UnitType extends Base {
         'factory'   => ['info', 'supply', 'sale', 'production'],
         'farm'      => ['info', 'supply', 'sale', 'production'],
         'storage'   => ['info', 'supply', 'sale'],
-        'mine'      => ['info', 'supply', 'sale', 'production'],
+        'mine'      => ['info', 'sale', 'production'],
         'construction' => ['info', 'supply', 'construction']
     ];
 
@@ -72,5 +72,23 @@ class UnitType extends Base {
     public function get_info() {
         $result = $this->get_fields(['id', 'title', 'type', 'cost']);
         return $result;
+    }
+
+    /**
+     * Список того, что требуется для производства
+     * @return array
+     * @throws Exception
+     */
+    public function get_product_cost() {
+        return MyDB::query("SELECT * FROM production_cost WHERE unitType = ?unit_type_id", ['unit_type_id' => $this->id]);
+    }
+
+    /**
+     * Список что тут производится
+     * @return array
+     * @throws Exception
+     */
+    public function get_product_making() {
+        return MyDB::query("SELECT * FROM production_making WHERE unitType = ?unit_type_id", ['unit_type_id' => $this->id]);
     }
 }

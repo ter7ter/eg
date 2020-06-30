@@ -52,4 +52,6 @@
     <?endforeach;?>
 </table>
 <div id="dialog-window"></div>
+<?if ($data['unit']['type']['type'] == 'shop' || $data['unit']['type']['type'] == 'storage'):?>
 <a class="link-button do-add-supply-product" href="#this">Добавить поставку</a>
+<?endif;?>

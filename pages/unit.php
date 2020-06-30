@@ -15,7 +15,9 @@ if ($unit) {
         $tab = 'info';
     }
     if ($unit->status == 'build') {
-        //$buildTime
+        $makingId = MyDB::query("SELECT id, unitId FROM unit_making WHERE makeId = ?id", ['id' => $unit->id], 'row');
+        $data['buildTime'] = MyDB::query("SELECT sum(remaindCost) FROM unit_making WHERE unitId = ?unit_id AND id <= ?id",
+            ['unit_id' => $makingId['unitId'], 'id' => $makingId['id']], 'elem');
     }
     switch ($action) {
         case 'update_sell':
@@ -56,7 +58,7 @@ if ($unit) {
 
     if ($tab == in_array($tab, ['supply', 'sale'])) {
         $data['products'] = [];
-        $products = $unit->get_products();
+        $products = $unit->get_product_supply();
         foreach ($products as $product) {
             $data['products'][$product->type->id] = $product->get_info();
             $data['products'][$product->type->id]['transport'] = [];
@@ -96,8 +98,8 @@ if ($unit) {
             }
         break;
         case 'production':
-            $list['makes'] = $unit->get_product_making();
-            $list['costs'] = $unit->get_product_cost();
+            $list['makes'] = $unit->type->get_product_making();
+            $list['costs'] = $unit->type->get_product_cost();
             foreach (['makes', 'costs'] as $listName) {
                 $data[$listName] = [];
                 foreach ($list[$listName] as $item) {
@@ -146,7 +148,7 @@ if ($unit) {
             }
         break;
         case 'construction':
-            $constructionPower = $unit->get_product_cost()[0];
+            $constructionPower = $unit->type->get_product_cost()[0];
             $material = $unit->get_product_by_type(ProductType::get(CONSTRUCTION_MATERIAL));
             if (!$material) {
                 $material = new Product(['typeId' => CONSTRUCTION_MATERIAL]);
