@@ -27,12 +27,12 @@ $unitTypes = [
     <?if (count($data['units'][$type])):?>
         <?foreach ($data['units'][$type] as $unit):?>
         <div class="unit-item">
-            <a href="/unit&id=<?=$unit['id']?>"><?=$unit['title']?></a>
+            <a href="/unit?id=<?=$unit['id']?>"><?=$unit['title']?></a>
         </div>
         <?endforeach;?>
     <?else:?>
     У вас пока нет <?=$unitType['title2']?>
     <?endif;?>
-    <a class="link-button" href="/create_unit&type=<?=$type?>">Создать</a>
+    <a class="link-button" href="/create_unit?type=<?=$type?>">Создать</a>
 </div>
 <?endforeach;?>

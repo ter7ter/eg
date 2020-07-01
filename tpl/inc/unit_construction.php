@@ -7,7 +7,7 @@
 </div>
 <div class="data-line">Использовано в строительстве <?=$data['construction']['queueAmount']?></div>
 <div class="data-line">
-<form action="/unit&id=<?=$data['unit']['id']?>&tab=construction" method="post">
+<form action="/unit?id=<?=$data['unit']['id']?>&tab=construction" method="post">
     <input type="hidden" name="action" value="update_construction">
     Цена одной единицы работ <input type="text" value="<?=$data['unit']['makePrice']?>" name="price" style="width: 10em">
     Строить <select name="access" style="width: 10em;">

@@ -1,4 +1,4 @@
-<form action="/unit&id=<?=$data['unit']['id']?>&tab=shop" method="post">
+<form action="/unit?id=<?=$data['unit']['id']?>&tab=shop" method="post">
     <input type="hidden" name="action" value="update_shop">
     <table class="products-table">
         <tr>

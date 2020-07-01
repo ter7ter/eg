@@ -21,7 +21,7 @@ function create_unit_page() {
     }
 
     $('#unit-select-country').change(function () {
-        $.getJSON('/get_regions&json=1&id=' + $('#unit-select-country').val(), function (response) {
+        $.getJSON('/get_regions?json=1&id=' + $('#unit-select-country').val(), function (response) {
             if (response.status == 'ok') {
                 $('#unit-select-city').empty();
                 for (var i in response.data.regions) {
@@ -34,7 +34,7 @@ function create_unit_page() {
         })
     });
     $('#unit-select-region').change(function () {
-        $.getJSON('/get_cities&json=1&id=' + $('#unit-select-region').val(), function (response) {
+        $.getJSON('/get_cities?json=1&id=' + $('#unit-select-region').val(), function (response) {
             if (response.status == 'ok') {
                 $('#unit-select-city').empty();
                 for (var i in response.data.cities) {
@@ -97,7 +97,7 @@ function unit_page() {
             'supplier_unit': $(e.currentTarget).closest('tr').attr('data-id'),
             'amount': amount
         };
-        $.post('/add_supply&json=1', vars, function (data) {
+        $.post('/add_supply?json=1', vars, function (data) {
             var response = $.parseJSON(data);
             if (response.status == 'ok') {
                 window.location.reload();
@@ -130,7 +130,7 @@ function unit_page() {
             'storage_unit': $(e.currentTarget).attr('data-id'),
             'amount': $(e.currentTarget).closest('.add-supply-form').attr('data-amount'),
         };
-        $.post('/storage_unload&json=1', vars, function (data) {
+        $.post('/storage_unload?json=1', vars, function (data) {
             response = $.parseJSON(data);
             if (response.status == 'ok') {
                 window.location.reload();
