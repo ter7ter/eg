@@ -2,14 +2,14 @@
 $page = 'message_error';
 $step = $_REQUEST['step'] ?? 1;
 $unit = Unit::get(intval(@$_REQUEST['unit_id']));
+if (!$unit) {
+    $error = 'Предприятие не найдено';
+    $step = 0;
+}
 if ($step == 3 || $step == 4) {
     $productType = ProductType::get(intval(@$_REQUEST['type_id']));
     if (!$productType) {
         $error = 'Такой тип товара не найден';
-        $step = 0;
-    }
-    if (!$unit) {
-        $error = 'Предприятие не найдено';
         $step = 0;
     }
 }
@@ -21,12 +21,33 @@ if ($unit && $unit->type->type == 'construction') {
 switch ($step) {
     case 1:
         $page = 'add_supply1';
-        $data['categories'] = ProductCategory::get_list_info();
+        if ($unit->type->type == 'storage') {
+            $data['categories'] = ProductCategory::get_list_info();
+        } elseif ($unit->type->type == 'shop') {
+            $data['categories'] = ProductCategory::get_list_info(['type' => 'final']);
+        } else {
+            $page = 'message_error';
+            $error = "Неверный запрос";
+        }
     break;
     case 2:
-        $page = 'add_supply2';
-        $categoryId = intval($_REQUEST['category_id']);
-        $data['productTypes'] = ProductType::get_list_info(['categoryId' => $categoryId]);
+        $category = ProductCategory::get(intval($_REQUEST['category_id']));
+        if (!$category) {
+            $error = 'Категория не найдена';
+        }
+        if ($unit->type->type == 'storage') {
+            $data['productTypes'] = ProductType::get_list_info(['categoryId' => $category->id]);
+            $page = 'add_supply2';
+        } elseif ($unit->type->type == 'shop') {
+            if ($category->type == 'final') {
+                $data['productTypes'] = ProductType::get_list_info(['categoryId' => $category->id, 'type' => 'final']);
+                $page = 'add_supply2';
+            } else {
+                $error = 'Категория не найдена';
+            }
+        } else {
+            $error = "Неверный запрос";
+        }
     break;
     case 3:
         $data['productType'] = $productType->get_info();

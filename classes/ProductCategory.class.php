@@ -2,6 +2,7 @@
 /**
  * Class ProductCategory
  * @property string title
+ * @property string type
  */
 class ProductCategory extends Base {
     public static $tablename = 'product_category';
@@ -10,6 +11,7 @@ class ProductCategory extends Base {
 
     public static $_FIELDS = [
         'title',
+        'type'
     ];
 
     public static $_REQUEST_FIELDS = [
@@ -38,7 +40,7 @@ class ProductCategory extends Base {
     }
 
     public function get_info() {
-        $result = $this->get_fields(['id', 'title']);
+        $result = $this->get_fields(['id', 'type', 'title']);
         return $result;
     }
 }

@@ -4,6 +4,9 @@
  * @property string title
  * @property string type
  * @property int cost
+ * @property int peopleNeed
+ * @property string peopleType
+ * @property int officeNeed
  */
 class UnitType extends Base {
     public static $tablename = 'unit_type';
@@ -13,7 +16,10 @@ class UnitType extends Base {
     public static $_FIELDS = [
         'title',
         'type',
-        'cost'
+        'cost',
+        'peopleNeed',
+        'peopleType',
+        'officeNeed'
     ];
 
     public static $_TYPES = [
@@ -25,13 +31,20 @@ class UnitType extends Base {
         'construction' => 'Строительное предпрятие'
     ];
 
+    public static $_PEOPLE_TYPES = [
+        'worker'    => ['рабочий', 'рабочие', 'рабочих'],
+        'salesman'  => ['продавец', 'продавцы', 'продавцов'],
+        'farmworker'=> ['крестьянин', 'крестьяне', 'крестьян'],
+        'office'    => ['офисный работник', 'офисные работники', 'офисных работников'],
+    ];
+
     public static $_UNIT_TABS = [
-        'shop'      => ['info', 'supply', 'storage', 'shop'],
-        'factory'   => ['info', 'supply', 'sale', 'production'],
-        'farm'      => ['info', 'supply', 'sale', 'production'],
-        'storage'   => ['info', 'supply', 'sale'],
-        'mine'      => ['info', 'sale', 'production'],
-        'construction' => ['info', 'supply', 'construction']
+        'shop'      => ['info', 'people', 'supply', 'storage', 'shop'],
+        'factory'   => ['info', 'people', 'supply', 'sale', 'production'],
+        'farm'      => ['info', 'people', 'supply', 'sale', 'production'],
+        'storage'   => ['info', 'people', 'supply', 'sale'],
+        'mine'      => ['info', 'people', 'sale', 'production'],
+        'construction' => ['info', 'people', 'supply', 'construction']
     ];
 
 
@@ -70,7 +83,7 @@ class UnitType extends Base {
     }
 
     public function get_info() {
-        $result = $this->get_fields(['id', 'title', 'type', 'cost']);
+        $result = $this->get_fields(['id', 'title', 'type', 'cost', 'peopleNeed', 'peopleType', 'officeNeed']);
         return $result;
     }
 

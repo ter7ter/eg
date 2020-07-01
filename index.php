@@ -57,6 +57,15 @@ do {
 } while ($endPage == false && $nextPage !== false);
 MyDB::end_transaction();
 
+if ($openedCompany) {
+    $data['companyList'] = [];
+    foreach ($companyList as $company) {
+        $data['companyList'][] = $company->get_info(true);
+    }
+    $data['openedCompany'] = $openedCompany->get_info(true);
+    $data['possibleCountries'] = Country::get_list_info(['currencyId' => $openedCompany->currency->id]);
+}
+
 if (!$endPage) {
     if (isset($_REQUEST['json'])) {
         if ($error) {

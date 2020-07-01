@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Июн 30 2020 г., 17:53
+-- Время создания: Июл 01 2020 г., 15:22
 -- Версия сервера: 5.7.23
 -- Версия PHP: 7.2.10
 
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `company` (
 --
 
 INSERT INTO `company` (`id`, `userId`, `title`, `money`, `currencyId`) VALUES
-(1, 1, 'Первая компания', 7010520, 1);
+(1, 1, 'Первая компания', 5774520, 1);
 
 -- --------------------------------------------------------
 
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id` (`userId`)
-) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `log`
@@ -211,7 +211,11 @@ INSERT INTO `log` (`id`, `type`, `userId`, `message`, `params`, `date`) VALUES
 (66, 'user_login', 1, 'Залогинился', NULL, '2020-06-29 17:18:43'),
 (67, 'user_login', 1, 'Залогинился', NULL, '2020-06-30 16:30:35'),
 (68, 'user_login', 1, 'Залогинился', NULL, '2020-06-30 16:31:13'),
-(69, 'user_login', 1, 'Залогинился', NULL, '2020-06-30 17:22:25');
+(69, 'user_login', 1, 'Залогинился', NULL, '2020-06-30 17:22:25'),
+(70, 'user_login', 1, 'Залогинился', NULL, '2020-07-01 05:45:21'),
+(71, 'user_login', 1, 'Залогинился', NULL, '2020-07-01 11:13:19'),
+(72, 'user_login', 1, 'Залогинился', NULL, '2020-07-01 13:33:52'),
+(73, 'user_login', 1, 'Залогинился', NULL, '2020-07-01 14:42:21');
 
 -- --------------------------------------------------------
 
@@ -234,6 +238,38 @@ CREATE TABLE IF NOT EXISTS `notification` (
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `population`
+--
+
+DROP TABLE IF EXISTS `population`;
+CREATE TABLE IF NOT EXISTS `population` (
+  `cityId` int(10) UNSIGNED NOT NULL,
+  `type` enum('worker','salesman','farmworker','office') NOT NULL,
+  `amount` int(10) UNSIGNED NOT NULL,
+  `quality` float UNSIGNED NOT NULL,
+  `pay` float UNSIGNED NOT NULL,
+  `dispersionPay` float UNSIGNED NOT NULL,
+  `dispersionQuality` float UNSIGNED NOT NULL,
+  PRIMARY KEY (`cityId`,`type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `population`
+--
+
+INSERT INTO `population` (`cityId`, `type`, `amount`, `quality`, `pay`, `dispersionPay`, `dispersionQuality`) VALUES
+(1, 'worker', 18408, 4.82909, 500, 10, 5),
+(1, 'salesman', 15000, 6, 700, 15, 6),
+(1, 'farmworker', 10000, 4, 400, 6, 3),
+(1, 'office', 10000, 7, 1000, 5, 5),
+(3, 'worker', 10000, 4, 400, 10, 6),
+(3, 'salesman', 5000, 5, 500, 10, 8),
+(3, 'farmworker', 4000, 4, 400, 8, 6),
+(3, 'office', 5000, 5, 600, 6, 8);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `product`
 --
 
@@ -247,7 +283,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   PRIMARY KEY (`id`),
   KEY `typeId` (`typeId`),
   KEY `unitId` (`unitId`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `product`
@@ -260,13 +296,13 @@ INSERT INTO `product` (`id`, `typeId`, `amount`, `quality`, `unitId`) VALUES
 (13, 11, 40, 4, 2),
 (15, 11, 5, 4, 5),
 (16, 11, 5, 4, 4),
-(17, 1, 84345.5, 1, 6),
+(17, 1, 118848, 1, 6),
 (18, 1, 1000, 1, 4),
 (19, 14, 36100, 1, 4),
 (20, 14, 4700, 1, 7),
 (22, 14, 4000, 1, 9),
-(23, 1, 920.5, 1, 12),
-(24, 2, 542.5, 1, 12),
+(23, 1, 0, 1, 12),
+(24, 2, 3502.75, 1, 12),
 (25, 14, 0, 0, 8);
 
 -- --------------------------------------------------------
@@ -329,6 +365,7 @@ DROP TABLE IF EXISTS `product_category`;
 CREATE TABLE IF NOT EXISTS `product_category` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
+  `type` enum('final','material','equipment') NOT NULL DEFAULT 'material',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 
@@ -336,17 +373,17 @@ CREATE TABLE IF NOT EXISTS `product_category` (
 -- Дамп данных таблицы `product_category`
 --
 
-INSERT INTO `product_category` (`id`, `title`) VALUES
-(1, 'Природные ресурсы'),
-(2, 'Материалы'),
-(3, 'Автомобильные товары'),
-(4, 'Продовольственные товары'),
-(5, 'Одежда, обувь'),
-(6, 'Мебель'),
-(7, 'Оборудование'),
-(8, 'Стройматериалы'),
-(9, 'Офисная техника'),
-(10, 'Бытовая техника');
+INSERT INTO `product_category` (`id`, `title`, `type`) VALUES
+(1, 'Природные ресурсы', 'material'),
+(2, 'Материалы', 'material'),
+(3, 'Автомобильные товары', 'final'),
+(4, 'Продовольственные товары', 'final'),
+(5, 'Одежда, обувь', 'final'),
+(6, 'Мебель', 'final'),
+(7, 'Оборудование', 'equipment'),
+(8, 'Стройматериалы', 'material'),
+(9, 'Офисная техника', 'final'),
+(10, 'Бытовая техника', 'final');
 
 -- --------------------------------------------------------
 
@@ -405,7 +442,7 @@ INSERT INTO `product_sale` (`unitId`, `typeId`, `price`, `currencyId`, `access`)
 (5, 2, 10, 1, 'all'),
 (6, 1, 10, 1, 'all'),
 (12, 1, 5, 1, 'all'),
-(12, 2, 0, 1, 'close');
+(12, 2, 20, 1, 'all');
 
 -- --------------------------------------------------------
 
@@ -443,7 +480,7 @@ DROP TABLE IF EXISTS `product_type`;
 CREATE TABLE IF NOT EXISTS `product_type` (
   `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` varchar(50) NOT NULL,
-  `type` enum('final','material','equipment','') NOT NULL,
+  `type` enum('final','material','equipment') NOT NULL,
   `categoryId` int(10) UNSIGNED NOT NULL,
   `weight` float UNSIGNED NOT NULL DEFAULT '1',
   `elasticity` float NOT NULL DEFAULT '1',
@@ -528,6 +565,12 @@ CREATE TABLE IF NOT EXISTS `unit` (
   `companyId` int(10) UNSIGNED NOT NULL,
   `cityId` int(10) UNSIGNED NOT NULL,
   `typeId` int(10) UNSIGNED NOT NULL,
+  `peopleCount` int(10) UNSIGNED NOT NULL,
+  `peopleQuality` float NOT NULL,
+  `peoplePay` float UNSIGNED NOT NULL,
+  `officeCount` int(10) UNSIGNED NOT NULL,
+  `officeQuality` float UNSIGNED NOT NULL,
+  `officePay` float UNSIGNED NOT NULL,
   `lastUpdate` datetime NOT NULL,
   PRIMARY KEY (`id`),
   KEY `companyId` (`companyId`),
@@ -539,17 +582,17 @@ CREATE TABLE IF NOT EXISTS `unit` (
 -- Дамп данных таблицы `unit`
 --
 
-INSERT INTO `unit` (`id`, `title`, `status`, `companyId`, `cityId`, `typeId`, `lastUpdate`) VALUES
-(2, 'Первый магазин', 'work', 1, 1, 5, '2020-06-29 17:50:35'),
-(3, 'Ларёк', 'work', 1, 1, 4, '2020-06-26 17:19:27'),
-(4, 'Средний склад', 'work', 1, 4, 7, '2020-06-26 17:33:12'),
-(5, 'Маленький склад', 'work', 1, 3, 6, '2020-06-28 08:13:34'),
-(6, 'Нефтяная вышка 1', 'work', 1, 5, 1, '2020-06-30 17:25:40'),
-(7, 'Строительное предприятие 1', 'work', 1, 1, 12, '2020-06-30 17:25:40'),
-(8, 'Стройка СПБ', 'work', 1, 3, 12, '2020-06-30 17:25:40'),
-(9, 'Строительная бригада', 'work', 1, 1, 11, '2020-06-30 17:25:40'),
-(11, 'Маленький склад', 'work', 1, 1, 6, '2020-06-29 17:53:47'),
-(12, 'Нефтеперерабатывающий завод', 'work', 1, 1, 2, '2020-06-30 17:25:40');
+INSERT INTO `unit` (`id`, `title`, `status`, `companyId`, `cityId`, `typeId`, `peopleCount`, `peopleQuality`, `peoplePay`, `officeCount`, `officeQuality`, `officePay`, `lastUpdate`) VALUES
+(2, 'Первый магазин', 'work', 1, 1, 5, 0, 0, 0, 0, 0, 0, '2020-06-29 17:50:35'),
+(3, 'Ларёк', 'work', 1, 1, 4, 0, 0, 0, 0, 0, 0, '2020-06-26 17:19:27'),
+(4, 'Средний склад', 'work', 1, 4, 7, 0, 0, 0, 0, 0, 0, '2020-06-26 17:33:12'),
+(5, 'Маленький склад', 'work', 1, 3, 6, 0, 0, 0, 0, 0, 0, '2020-06-28 08:13:34'),
+(6, 'Нефтяная вышка 1', 'work', 1, 5, 1, 0, 0, 0, 0, 0, 0, '2020-07-01 15:22:20'),
+(7, 'Строительное предприятие 1', 'work', 1, 1, 12, 292, 7.042, 1000, 0, 0, 0, '2020-07-01 15:22:20'),
+(8, 'Стройка СПБ', 'work', 1, 3, 12, 0, 0, 0, 0, 0, 0, '2020-07-01 15:22:20'),
+(9, 'Строительная бригада', 'work', 1, 1, 11, 0, 0, 0, 0, 0, 0, '2020-07-01 15:22:20'),
+(11, 'Маленький склад', 'work', 1, 1, 6, 0, 0, 0, 0, 0, 0, '2020-06-29 17:53:47'),
+(12, 'Нефтеперерабатывающий завод', 'work', 1, 1, 2, 0, 0, 0, 0, 0, 0, '2020-07-01 15:22:20');
 
 -- --------------------------------------------------------
 
@@ -591,7 +634,7 @@ CREATE TABLE IF NOT EXISTS `unit_making` (
   PRIMARY KEY (`id`),
   KEY `makeId` (`makeId`),
   KEY `unitId` (`unitId`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -602,10 +645,10 @@ CREATE TABLE IF NOT EXISTS `unit_making` (
 DROP TABLE IF EXISTS `unit_sale`;
 CREATE TABLE IF NOT EXISTS `unit_sale` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` enum('sale','shop','build','') NOT NULL DEFAULT 'sale',
+  `type` enum('sale','shop','build','pay') NOT NULL DEFAULT 'sale',
   `unitFrom` int(10) UNSIGNED DEFAULT NULL,
   `unitTo` int(10) UNSIGNED DEFAULT NULL,
-  `productType` int(10) UNSIGNED NOT NULL,
+  `productType` int(10) UNSIGNED DEFAULT NULL,
   `valueFrom` float NOT NULL,
   `valueTo` float NOT NULL,
   `amount` int(10) UNSIGNED NOT NULL,
@@ -615,7 +658,7 @@ CREATE TABLE IF NOT EXISTS `unit_sale` (
   KEY `productType` (`productType`),
   KEY `unitFrom` (`unitFrom`),
   KEY `unitTo` (`unitTo`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `unit_sale`
@@ -635,7 +678,18 @@ INSERT INTO `unit_sale` (`id`, `type`, `unitFrom`, `unitTo`, `productType`, `val
 (16, 'sale', 4, 9, 14, 20000, -20000, 4000, 1, '2020-06-29 13:46:47'),
 (17, 'build', 7, 11, 14, 1800, -1800, 200, 1, '2020-06-29 17:47:49'),
 (18, 'build', 7, 12, 14, 45000, -45000, 5000, 1, '2020-06-29 17:53:47'),
-(19, 'sale', 6, 12, 1, 10000, -10000, 1000, 1, '2020-06-30 16:32:55');
+(19, 'sale', 6, 12, 1, 10000, -10000, 1000, 1, '2020-06-30 16:32:55'),
+(20, 'sale', 6, 12, 1, 50000, -50000, 5000, 1, '2020-07-01 06:08:59'),
+(21, 'pay', NULL, 7, NULL, 0, -70000, 200, 5.88889, '2020-07-01 14:47:09'),
+(22, 'pay', NULL, 7, NULL, 0, -250000, 500, 7.20925, '2020-07-01 14:49:59'),
+(23, 'pay', NULL, 7, NULL, 0, -250000, 500, 7.12624, '2020-07-01 15:03:04'),
+(24, 'pay', NULL, 7, NULL, 0, -250000, 500, 7.042, '2020-07-01 15:05:21'),
+(25, 'pay', NULL, 7, NULL, 0, -200000, 100, 7.042, '2020-07-01 15:17:20'),
+(26, 'pay', NULL, 7, NULL, 0, -200000, 100, 7.042, '2020-07-01 15:19:09'),
+(27, 'pay', NULL, 7, NULL, 0, -2000, 1, 7.042, '2020-07-01 15:20:15'),
+(28, 'pay', NULL, 7, NULL, 0, -2000, 1, 7.042, '2020-07-01 15:20:19'),
+(29, 'pay', NULL, 7, NULL, 0, -2000, 1, 7.042, '2020-07-01 15:20:26'),
+(30, 'pay', NULL, 7, NULL, 0, -10000, 5, 7.042, '2020-07-01 15:22:27');
 
 -- --------------------------------------------------------
 
@@ -649,6 +703,9 @@ CREATE TABLE IF NOT EXISTS `unit_type` (
   `title` varchar(50) NOT NULL,
   `type` enum('shop','factory','farm','storage','mine','construction') NOT NULL,
   `cost` int(10) UNSIGNED NOT NULL DEFAULT '10000',
+  `peopleNeed` int(10) UNSIGNED NOT NULL,
+  `peopleType` enum('worker','salesman','farmworker') NOT NULL,
+  `officeNeed` int(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 
@@ -656,19 +713,19 @@ CREATE TABLE IF NOT EXISTS `unit_type` (
 -- Дамп данных таблицы `unit_type`
 --
 
-INSERT INTO `unit_type` (`id`, `title`, `type`, `cost`) VALUES
-(1, 'Нефтяная вышка', 'mine', 5000),
-(2, 'Нефтеперерабатывающий завод', 'factory', 5000),
-(3, 'Завод автомобильных шин', 'factory', 5000),
-(4, 'Ларёк', 'shop', 100),
-(5, 'Магазин', 'shop', 400),
-(6, 'Маленький склад', 'storage', 200),
-(7, 'Средний склад', 'storage', 1000),
-(8, 'Большой склад', 'storage', 10000),
-(9, 'Железный рудник', 'mine', 5000),
-(10, 'Угольный рудник', 'mine', 5000),
-(11, 'Строительная бригада', 'construction', 500),
-(12, 'Строительное предприятие', 'construction', 5000);
+INSERT INTO `unit_type` (`id`, `title`, `type`, `cost`, `peopleNeed`, `peopleType`, `officeNeed`) VALUES
+(1, 'Нефтяная вышка', 'mine', 20000, 500, 'worker', 40),
+(2, 'Нефтеперерабатывающий завод', 'factory', 30000, 1000, 'worker', 80),
+(3, 'Завод автомобильных шин', 'factory', 15000, 800, 'worker', 50),
+(4, 'Ларёк', 'shop', 300, 5, 'salesman', 1),
+(5, 'Магазин', 'shop', 1000, 25, 'salesman', 5),
+(6, 'Маленький склад', 'storage', 500, 50, 'worker', 5),
+(7, 'Средний склад', 'storage', 2000, 200, 'worker', 20),
+(8, 'Большой склад', 'storage', 20000, 1500, 'worker', 180),
+(9, 'Железный рудник', 'mine', 20000, 600, 'worker', 40),
+(10, 'Угольный рудник', 'mine', 20000, 600, 'worker', 40),
+(11, 'Строительная бригада', 'construction', 800, 100, 'worker', 10),
+(12, 'Строительное предприятие', 'construction', 10000, 1000, 'worker', 100);
 
 -- --------------------------------------------------------
 
@@ -711,7 +768,7 @@ CREATE TABLE IF NOT EXISTS `visit` (
   `refer` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `user_id` (`userId`)
-) ENGINE=InnoDB AUTO_INCREMENT=1473 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1727 DEFAULT CHARSET=utf8;
 
 --
 -- Дамп данных таблицы `visit`
@@ -2143,7 +2200,258 @@ INSERT INTO `visit` (`id`, `date`, `page`, `userId`, `refer`) VALUES
 (1469, '2020-06-30 20:50:27', 'units', 1, 'http://eg.game/unit&id=7&tab=supply'),
 (1470, '2020-06-30 20:50:28', 'unit', 1, 'http://eg.game/units'),
 (1471, '2020-06-30 20:50:29', 'unit', 1, 'http://eg.game/unit&id=8'),
-(1472, '2020-06-30 20:50:30', 'add_supply', 1, 'http://eg.game/unit&id=8&tab=supply');
+(1472, '2020-06-30 20:50:30', 'add_supply', 1, 'http://eg.game/unit&id=8&tab=supply'),
+(1473, '2020-07-01 08:37:52', 'index', NULL, 'http://127.0.0.1:81/'),
+(1474, '2020-07-01 08:37:55', 'index', NULL, ''),
+(1475, '2020-07-01 08:37:55', 'index', NULL, 'http://127.0.0.1:81/'),
+(1476, '2020-07-01 08:37:57', 'index', NULL, 'http://127.0.0.1:81/'),
+(1477, '2020-07-01 08:37:57', 'index', NULL, 'http://127.0.0.1:81/login'),
+(1478, '2020-07-01 08:37:58', 'index', NULL, 'http://127.0.0.1:81/login'),
+(1479, '2020-07-01 08:37:58', 'index', NULL, 'http://127.0.0.1:81/login'),
+(1480, '2020-07-01 08:38:09', 'index', NULL, 'http://127.0.0.1:81/login'),
+(1481, '2020-07-01 08:38:10', 'index', NULL, 'http://127.0.0.1:81/register'),
+(1482, '2020-07-01 08:38:10', 'index', NULL, 'http://127.0.0.1:81/register'),
+(1483, '2020-07-01 08:38:11', 'index', NULL, 'http://127.0.0.1:81/login'),
+(1484, '2020-07-01 08:38:37', 'login', NULL, 'http://127.0.0.1:81/register'),
+(1485, '2020-07-01 08:45:21', 'login', NULL, 'http://127.0.0.1:81/login'),
+(1486, '2020-07-01 08:45:24', 'units', 1, 'http://127.0.0.1:81/login'),
+(1487, '2020-07-01 08:45:27', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1488, '2020-07-01 08:45:30', 'units', 1, 'http://127.0.0.1:81/login'),
+(1489, '2020-07-01 08:45:33', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1490, '2020-07-01 08:45:34', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1491, '2020-07-01 08:45:38', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1492, '2020-07-01 08:46:26', 'units', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1493, '2020-07-01 08:46:27', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1494, '2020-07-01 08:46:28', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1495, '2020-07-01 08:46:35', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=4&tab=supply'),
+(1496, '2020-07-01 08:49:00', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1497, '2020-07-01 08:49:01', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=4&tab=supply'),
+(1498, '2020-07-01 08:49:04', 'units', 1, 'http://127.0.0.1:81/unit?id=4&tab=supply'),
+(1499, '2020-07-01 08:49:05', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1500, '2020-07-01 08:49:06', 'units', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1501, '2020-07-01 08:49:07', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1502, '2020-07-01 08:49:09', 'unit', 1, 'http://127.0.0.1:81/unit?id=2'),
+(1503, '2020-07-01 08:49:10', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1504, '2020-07-01 08:52:09', 'unit', 1, 'http://127.0.0.1:81/unit?id=2'),
+(1505, '2020-07-01 08:52:10', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1506, '2020-07-01 08:52:11', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1507, '2020-07-01 08:52:41', 'unit', 1, 'http://127.0.0.1:81/unit?id=2'),
+(1508, '2020-07-01 08:52:41', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1509, '2020-07-01 08:52:42', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1510, '2020-07-01 08:52:43', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1511, '2020-07-01 08:52:44', 'unit', 1, 'http://127.0.0.1:81/unit?id=2'),
+(1512, '2020-07-01 08:52:45', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1513, '2020-07-01 08:52:46', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1514, '2020-07-01 08:52:47', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1515, '2020-07-01 08:52:47', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1516, '2020-07-01 08:52:48', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1517, '2020-07-01 08:52:50', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1518, '2020-07-01 08:52:51', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1519, '2020-07-01 08:52:53', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1520, '2020-07-01 08:52:54', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1521, '2020-07-01 08:52:55', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1522, '2020-07-01 08:52:55', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1523, '2020-07-01 08:52:56', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1524, '2020-07-01 08:52:58', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1525, '2020-07-01 08:52:59', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1526, '2020-07-01 08:53:00', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1527, '2020-07-01 08:56:29', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1528, '2020-07-01 08:56:31', 'units', 1, 'http://127.0.0.1:81/unit?id=2&tab=storage'),
+(1529, '2020-07-01 08:56:32', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1530, '2020-07-01 08:56:45', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1531, '2020-07-01 08:58:04', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1532, '2020-07-01 08:58:08', 'storage_unload', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1533, '2020-07-01 09:08:38', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1534, '2020-07-01 09:08:38', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1535, '2020-07-01 09:08:50', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1536, '2020-07-01 09:08:52', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1537, '2020-07-01 09:08:59', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1538, '2020-07-01 09:09:00', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1539, '2020-07-01 09:09:01', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1540, '2020-07-01 09:09:39', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1541, '2020-07-01 09:09:40', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1542, '2020-07-01 09:15:10', 'units', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1543, '2020-07-01 09:19:23', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1544, '2020-07-01 09:19:24', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1545, '2020-07-01 09:19:26', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1546, '2020-07-01 09:19:29', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1547, '2020-07-01 09:26:23', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1548, '2020-07-01 09:26:24', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1549, '2020-07-01 09:26:28', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1550, '2020-07-01 09:26:28', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1551, '2020-07-01 09:26:30', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1552, '2020-07-01 09:26:33', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=sale'),
+(1553, '2020-07-01 09:26:36', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1554, '2020-07-01 09:26:37', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=sale'),
+(1555, '2020-07-01 09:26:38', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1556, '2020-07-01 09:27:02', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=sale'),
+(1557, '2020-07-01 09:27:03', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1558, '2020-07-01 09:45:57', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1559, '2020-07-01 09:45:58', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=sale'),
+(1560, '2020-07-01 09:45:59', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1561, '2020-07-01 09:46:06', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=sale'),
+(1562, '2020-07-01 10:02:50', 'units', 1, 'http://127.0.0.1:81/unit?id=12&tab=sale'),
+(1563, '2020-07-01 10:02:52', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1564, '2020-07-01 10:02:56', 'unit', 1, 'http://127.0.0.1:81/unit?id=2'),
+(1565, '2020-07-01 10:02:56', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1566, '2020-07-01 10:02:58', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=storage'),
+(1567, '2020-07-01 10:02:58', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=shop'),
+(1568, '2020-07-01 10:02:59', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=storage'),
+(1569, '2020-07-01 10:03:01', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=storage'),
+(1570, '2020-07-01 10:03:03', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1571, '2020-07-01 10:03:03', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=storage'),
+(1572, '2020-07-01 10:03:14', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=shop'),
+(1573, '2020-07-01 10:03:35', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=shop'),
+(1574, '2020-07-01 10:03:36', 'unit', 1, 'http://127.0.0.1:81/unit?id=2&tab=supply'),
+(1575, '2020-07-01 10:03:59', 'units', 1, 'http://127.0.0.1:81/unit?&id=2&tab=info'),
+(1576, '2020-07-01 10:04:07', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1577, '2020-07-01 10:04:09', 'units', 1, 'http://127.0.0.1:81/unit?&id=2&tab=info'),
+(1578, '2020-07-01 10:06:05', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1579, '2020-07-01 10:10:47', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1580, '2020-07-01 10:16:29', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1581, '2020-07-01 10:16:34', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1582, '2020-07-01 10:17:16', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1583, '2020-07-01 10:17:53', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1584, '2020-07-01 10:22:21', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1585, '2020-07-01 10:23:08', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1586, '2020-07-01 10:23:16', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1587, '2020-07-01 10:23:58', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1588, '2020-07-01 10:24:07', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1589, '2020-07-01 10:25:16', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1590, '2020-07-01 10:25:41', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1591, '2020-07-01 10:28:26', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1592, '2020-07-01 10:32:00', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1593, '2020-07-01 10:32:09', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1594, '2020-07-01 10:32:50', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1595, '2020-07-01 10:32:50', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1596, '2020-07-01 10:32:51', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1597, '2020-07-01 10:32:56', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1598, '2020-07-01 10:33:37', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1599, '2020-07-01 10:34:56', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1600, '2020-07-01 10:35:18', 'unit', 1, 'http://127.0.0.1:81/unit?&id=4&tab=people'),
+(1601, '2020-07-01 10:35:19', 'unit', 1, 'http://127.0.0.1:81/unit?id=4&tab=supply'),
+(1602, '2020-07-01 10:35:20', 'unit', 1, 'http://127.0.0.1:81/unit?&id=4&tab=people'),
+(1603, '2020-07-01 10:35:21', 'units', 1, 'http://127.0.0.1:81/unit?id=4&tab=sale'),
+(1604, '2020-07-01 10:35:22', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1605, '2020-07-01 10:35:24', 'unit', 1, 'http://127.0.0.1:81/unit?id=4'),
+(1606, '2020-07-01 10:35:24', 'unit', 1, 'http://127.0.0.1:81/unit?&id=4&tab=people'),
+(1607, '2020-07-01 10:35:26', 'units', 1, 'http://127.0.0.1:81/unit?id=4&tab=supply'),
+(1608, '2020-07-01 10:35:28', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1609, '2020-07-01 10:35:29', 'units', 1, 'http://127.0.0.1:81/unit?id=6'),
+(1610, '2020-07-01 10:35:30', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1611, '2020-07-01 10:35:31', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1612, '2020-07-01 10:35:33', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1613, '2020-07-01 10:35:34', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1614, '2020-07-01 10:35:36', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=sale'),
+(1615, '2020-07-01 10:35:37', 'unit', 1, 'http://127.0.0.1:81/unit?&id=12&tab=info'),
+(1616, '2020-07-01 10:35:38', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=supply'),
+(1617, '2020-07-01 10:35:39', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1618, '2020-07-01 10:35:39', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=sale'),
+(1619, '2020-07-01 10:35:40', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1620, '2020-07-01 10:35:41', 'unit', 1, 'http://127.0.0.1:81/unit?&id=12&tab=people'),
+(1621, '2020-07-01 10:58:53', 'unit', 1, 'http://127.0.0.1:81/unit?&id=12&tab=people'),
+(1623, '2020-07-01 10:59:11', 'unit', 1, 'http://127.0.0.1:81/unit?id=12&tab=production'),
+(1624, '2020-07-01 10:59:14', 'unit', 1, ''),
+(1625, '2020-07-01 14:13:14', 'login', NULL, 'http://127.0.0.1:81/unit?&id=12&tab=people'),
+(1626, '2020-07-01 14:13:19', 'login', NULL, 'http://127.0.0.1:81/unit?&id=12&tab=people'),
+(1627, '2020-07-01 14:13:21', 'units', 1, 'http://127.0.0.1:81/login'),
+(1628, '2020-07-01 14:13:26', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1629, '2020-07-01 14:13:27', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1630, '2020-07-01 14:13:46', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1631, '2020-07-01 14:15:14', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1632, '2020-07-01 14:15:36', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1633, '2020-07-01 14:15:45', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1634, '2020-07-01 14:16:31', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1635, '2020-07-01 14:16:44', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1636, '2020-07-01 14:17:50', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1637, '2020-07-01 14:21:05', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1638, '2020-07-01 14:21:35', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1639, '2020-07-01 14:22:50', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1640, '2020-07-01 14:22:51', 'unit', 1, 'http://127.0.0.1:81/unit?id=12'),
+(1641, '2020-07-01 16:32:31', 'login', NULL, 'http://127.0.0.1:81/unit?&id=4&tab=people'),
+(1642, '2020-07-01 16:33:52', 'login', NULL, 'http://127.0.0.1:81/unit?&id=4&tab=people'),
+(1643, '2020-07-01 16:33:55', 'units', 1, 'http://127.0.0.1:81/login'),
+(1644, '2020-07-01 16:34:01', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1645, '2020-07-01 16:34:02', 'unit', 1, 'http://127.0.0.1:81/unit?id=5'),
+(1646, '2020-07-01 16:38:32', 'unit', 1, 'http://127.0.0.1:81/unit?id=5'),
+(1647, '2020-07-01 16:39:47', 'unit', 1, 'http://127.0.0.1:81/unit?id=5'),
+(1648, '2020-07-01 16:39:54', 'unit', 1, 'http://127.0.0.1:81/unit?id=5'),
+(1649, '2020-07-01 16:40:42', 'unit', 1, 'http://127.0.0.1:81/unit?id=5'),
+(1650, '2020-07-01 16:42:15', 'unit', 1, ''),
+(1651, '2020-07-01 16:43:42', 'unit', 1, ''),
+(1652, '2020-07-01 16:45:11', 'unit', 1, ''),
+(1653, '2020-07-01 16:45:20', 'unit', 1, ''),
+(1654, '2020-07-01 16:46:01', 'unit', 1, 'http://127.0.0.1:81/unit?id=5'),
+(1655, '2020-07-01 16:46:55', 'unit', 1, 'http://127.0.0.1:81/unit?id=5'),
+(1656, '2020-07-01 16:47:01', 'unit', 1, 'http://127.0.0.1:81/unit?&id=5&tab=people'),
+(1657, '2020-07-01 16:47:03', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=supply'),
+(1658, '2020-07-01 16:47:03', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=sale'),
+(1659, '2020-07-01 16:47:05', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=5&tab=supply'),
+(1660, '2020-07-01 16:47:05', 'add_supply', 1, 'http://127.0.0.1:81/unit?id=5&tab=supply'),
+(1661, '2020-07-01 16:47:06', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=supply'),
+(1662, '2020-07-01 16:47:07', 'unit', 1, 'http://127.0.0.1:81/unit?&id=5&tab=people'),
+(1663, '2020-07-01 16:47:08', 'unit', 1, 'http://127.0.0.1:81/unit?&id=5&tab=info'),
+(1664, '2020-07-01 16:49:51', 'unit', 1, 'http://127.0.0.1:81/unit?&id=5&tab=info'),
+(1665, '2020-07-01 16:49:54', 'unit', 1, 'http://127.0.0.1:81/unit?&id=5&tab=people'),
+(1666, '2020-07-01 16:49:58', 'unit', 1, 'http://127.0.0.1:81/unit?&id=5&tab=people'),
+(1667, '2020-07-01 16:50:00', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1668, '2020-07-01 16:50:18', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1669, '2020-07-01 16:50:32', 'unit', 1, ''),
+(1670, '2020-07-01 16:50:33', 'unit', 1, ''),
+(1671, '2020-07-01 16:50:45', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1672, '2020-07-01 16:51:21', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1673, '2020-07-01 16:51:23', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1674, '2020-07-01 16:51:24', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1675, '2020-07-01 16:51:29', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1676, '2020-07-01 16:51:35', 'unit', 1, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1677, '2020-07-01 17:42:16', 'login', NULL, ''),
+(1678, '2020-07-01 17:42:21', 'login', NULL, 'http://127.0.0.1:81/unit?id=5&tab=people'),
+(1679, '2020-07-01 17:42:23', 'units', 1, 'http://127.0.0.1:81/login'),
+(1680, '2020-07-01 17:42:25', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1681, '2020-07-01 17:42:26', 'unit', 1, 'http://127.0.0.1:81/unit?id=6'),
+(1682, '2020-07-01 17:43:20', 'unit', 1, ''),
+(1683, '2020-07-01 17:43:36', 'units', 1, 'http://127.0.0.1:81/unit?&id=6&tab=people'),
+(1684, '2020-07-01 17:43:43', 'unit', 1, 'http://127.0.0.1:81/units'),
+(1685, '2020-07-01 17:43:44', 'unit', 1, 'http://127.0.0.1:81/unit?id=7'),
+(1686, '2020-07-01 17:43:45', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=supply'),
+(1687, '2020-07-01 17:44:22', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=supply'),
+(1688, '2020-07-01 17:44:23', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=info'),
+(1690, '2020-07-01 17:45:20', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=people'),
+(1691, '2020-07-01 17:45:30', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=people'),
+(1692, '2020-07-01 17:45:38', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=people'),
+(1694, '2020-07-01 17:47:09', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=people'),
+(1695, '2020-07-01 17:49:59', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people'),
+(1696, '2020-07-01 17:50:16', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people'),
+(1697, '2020-07-01 17:50:23', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=info'),
+(1698, '2020-07-01 17:50:24', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=people'),
+(1699, '2020-07-01 17:50:25', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=supply'),
+(1700, '2020-07-01 17:50:25', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=people'),
+(1701, '2020-07-01 17:50:25', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=info'),
+(1702, '2020-07-01 17:50:26', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=people'),
+(1703, '2020-07-01 17:50:28', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=supply'),
+(1704, '2020-07-01 17:50:31', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=construction'),
+(1705, '2020-07-01 17:59:11', 'unit', 1, ''),
+(1706, '2020-07-01 18:02:48', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=construction'),
+(1707, '2020-07-01 18:03:04', 'unit', 1, 'http://127.0.0.1:81/unit?&id=7&tab=people'),
+(1708, '2020-07-01 18:05:13', 'unit', 1, ''),
+(1709, '2020-07-01 18:05:21', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people'),
+(1710, '2020-07-01 18:06:00', 'unit', 1, ''),
+(1711, '2020-07-01 18:06:10', 'unit', 1, ''),
+(1712, '2020-07-01 18:16:54', 'unit', 1, ''),
+(1713, '2020-07-01 18:17:14', 'main', 1, ''),
+(1714, '2020-07-01 18:17:20', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people'),
+(1715, '2020-07-01 18:19:03', 'unit', 1, ''),
+(1716, '2020-07-01 18:19:09', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people'),
+(1717, '2020-07-01 18:19:13', 'main', 1, ''),
+(1718, '2020-07-01 18:20:15', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people'),
+(1719, '2020-07-01 18:20:19', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people'),
+(1720, '2020-07-01 18:20:21', 'unit', 1, ''),
+(1721, '2020-07-01 18:20:22', 'unit', 1, ''),
+(1722, '2020-07-01 18:20:26', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people'),
+(1723, '2020-07-01 18:22:20', 'unit', 1, ''),
+(1724, '2020-07-01 18:22:20', 'unit', 1, ''),
+(1725, '2020-07-01 18:22:21', 'unit', 1, ''),
+(1726, '2020-07-01 18:22:27', 'unit', 1, 'http://127.0.0.1:81/unit?id=7&tab=people');
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -2173,6 +2481,12 @@ ALTER TABLE `country`
 --
 ALTER TABLE `notification`
   ADD CONSTRAINT `notification_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `population`
+--
+ALTER TABLE `population`
+  ADD CONSTRAINT `population_ibfk_1` FOREIGN KEY (`cityId`) REFERENCES `city` (`id`);
 
 --
 -- Ограничения внешнего ключа таблицы `product`

@@ -234,11 +234,37 @@ h3, h4 {
 	top: 30vh;
 	padding: 15px 10px;
 }
+.unit-people-window {
+	position: absolute;
+	box-shadow: 1px 1px 2px 1px grey;
+	display: none;
+	width: 40vw;
+	background-color: #eeeeee;
+	border-radius: 8px;
+	left: 30vw;
+	top: 40vh;
+	padding: 15px 10px;
+	text-align: center;
+}
+.unit-people-window span {
+	font-weight: bold;
+}
+.unit-people-window input[type=number], .unit-people-window input[type=text] {
+	width: 5em;
+}
 .product-supply {
 	width: 100%;
 }
 .product-supply td, .product-supply th {
 	background-color: transparent;
+}
+.unit-people-info {
+	background-color: #d6d6e0;
+	padding: 10px 2em;
+	margin: 5px 1em 10px 1em;
+}
+.unit-people-info input[type=number] {
+	width: 5em;
 }
 /**
 Форма добавления поставки

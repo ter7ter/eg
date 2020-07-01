@@ -6,6 +6,12 @@
  * @property int companyId
  * @property int cityId
  * @property string typeId
+ * @property int peopleCount
+ * @property float peopleQuality
+ * @property float peoplePay
+ * @property int officeCount
+ * @property float officeQuality
+ * @property float officePay
  * @property string lastUpdate
  */
 class Unit extends Base {
@@ -19,6 +25,12 @@ class Unit extends Base {
         'companyId',
         'cityId',
         'typeId',
+        'peopleCount',
+        'peopleQuality',
+        'peoplePay',
+        'officeCount',
+        'officeQuality',
+        'officePay',
         'lastUpdate'
     ];
 
@@ -65,6 +77,12 @@ class Unit extends Base {
     }
 
     public function __construct($data) {
+        foreach (['office', 'people'] as $type) {
+            foreach (['Count', 'Pay', 'Quality'] as $field) {
+                $filedName = $type.$field;
+                $this->$filedName = 0;
+            }
+        }
         parent::__construct($data);
         $this->company = Company::get($this->companyId);
         $this->city = City::get($this->cityId);
@@ -102,6 +120,11 @@ class Unit extends Base {
         return $result;
     }
 
+    /**
+     * Список товаров вкладки "Снабжение"
+     * @return Product[]
+     * @throws Exception
+     */
     public function get_product_supply() {
         if (in_array($this->type, ['shop', 'storage'])) {
             return $this->get_products();
@@ -126,7 +149,28 @@ class Unit extends Base {
     }
 
     /**
-     * Список товаров, которые стоят на сбыт
+     * Список товаров вкладки "Сбыт"
+     * @return Product[]
+     * @throws Exception
+     */
+    public function get_product_sale() {
+        if (in_array($this->type, ['shop', 'storage'])) {
+            return $this->get_products();
+        } else {
+            $result = [];
+            $needProducts = $this->type->get_product_making();
+            foreach ($needProducts as $need) {
+                $product = $this->get_product_by_type(ProductType::get($need['productType']));
+                if ($product) {
+                    $result[] = $product;
+                }
+            }
+            return $result;
+        }
+    }
+
+    /**
+     * Список товаров, у которых установлены цены на сбыт
      * @return array
      * @throws Exception
      */
@@ -166,11 +210,11 @@ class Unit extends Base {
      * @throws Exception
      */
     public function get_transport_to() {
-        $trasport = MyDB::query("SELECT transport.id, transport.unitFrom as unitId, transport.startTime, transport.endTime, 
+        $transport = MyDB::query("SELECT transport.id, transport.unitFrom as unitId, transport.startTime, transport.endTime, 
             product.amount, product.quality, product.typeId FROM transport 
             INNER JOIN product ON product.id = transport.productId
             WHERE unitTo = ?id", ['id' => $this->id]);
-        return $trasport;
+        return $transport;
     }
 
     /**
@@ -178,11 +222,11 @@ class Unit extends Base {
      * @throws Exception
      */
     public function get_transport_from() {
-        $trasport = MyDB::query("SELECT transport.id, transport.unitFrom as unitId, transport.startTime, transport.endTime, 
+        $transport = MyDB::query("SELECT transport.id, transport.unitFrom as unitId, transport.startTime, transport.endTime, 
             product.amount, product.quality, product.typeId FROM transport 
             INNER JOIN product ON product.id = transport.productId
             WHERE unitFrom = ?id", ['id' => $this->id]);
-        return $trasport;
+        return $transport;
     }
 
     /**
@@ -275,7 +319,9 @@ class Unit extends Base {
     }
 
     public function get_info($owner = false) {
-        $result = $this->get_fields(['id', 'title', 'status']);
+        $result = $this->get_fields(['id', 'title', 'status',
+            'peopleCount', 'peopleQuality', 'peoplePay',
+            'officeCount', 'officeQuality', 'officePay']);
         $result['type'] = $this->type->get_info();
         if ($this->type->type == 'construction') {
             $result['makePrice'] = $this->makePrice;
@@ -423,6 +469,88 @@ class Unit extends Base {
             $unit->company -= $price;
             $unit->company->save();
         }
+        return true;
+    }
+
+    public function employ_people($peopleType, $peopleCount, $peoplePay) {
+        if ($peopleType == 'office') {
+            $needPeople = $this->type->officeNeed - $this->officeCount;
+        } else {
+            $peopleType = $this->type->peopleType;
+            $needPeople = $this->type->peopleNeed - $this->peopleCount;
+        }
+        if ($needPeople < 1) {
+            return false;
+        };
+        if ($peopleCount > $needPeople) {
+            $peopleCount = $needPeople;
+        }
+        if ($peopleCount < 1) {
+            return false;
+        }
+        $peopleQuality = $this->city->calculate_people_quality($peopleType, $peoplePay);
+        if (!$peopleQuality) {
+            return false;
+        }
+        $this->company->money -= ($peoplePay*$peopleCount) / 2;
+        $this->company->save();
+        if ($peopleType == 'office') {
+            $unionQuality = ($this->officeCount*$this->officeQuality + $peopleCount*$peopleQuality) / ($this->officeCount + $peopleCount);
+            $this->officePay += ($this->officePay*$this->officeCount + $peoplePay*$peopleCount) / ($this->officeCount + $peopleCount);
+            $this->officeQuality = $unionQuality;
+            $this->officeCount += $peopleCount;
+        } else {
+            $unionQuality = ($this->peopleCount*$this->peopleQuality + $peopleCount*$peopleQuality) / ($this->peopleCount + $peopleCount);
+            $this->peoplePay += ($this->peoplePay*$this->peopleCount + $peoplePay*$peopleCount) / ($this->peopleCount + $peopleCount);
+            $this->peopleQuality = $unionQuality;
+            $this->peopleCount += $peopleCount;
+        }
+        $this->save();
+        MyDB::insert('unit_sale', [
+            'type' => 'pay',
+            'unitTo' => $this->id,
+            'valueFrom' => 0,
+            'valueTo' => (-1*$peoplePay*$peopleCount) / 2,
+            'amount' => $peopleCount,
+            'quality' => $peopleQuality,
+            'date' => timestamp_to_db()
+        ]);
+        $this->city->add_population($peopleType, -1*$peopleCount, $peopleQuality);
+        return true;
+    }
+
+    public function kick_people($peopleType, $peopleCount) {
+        if ($peopleType == 'office') {
+            if ($peopleCount > $this->officeCount) $peopleCount = $this->officeCount;
+            $peoplePay = $this->officePay;
+            $peopleQuality = $this->officeQuality;
+        } else {
+            if ($peopleCount > $this->peopleCount) $peopleCount = $this->peopleCount;
+            $peoplePay = $this->peoplePay;
+            $peopleQuality = $this->peopleQuality;
+            $peopleType = $this->type->peopleType;
+        }
+        if ($peopleCount < 1) {
+            return false;
+        };
+        $this->company->money -= ($peoplePay*$peopleCount) * 2;
+        $this->company->save();
+        if ($peopleType == 'office') {
+            $this->officeCount -= $peopleCount;
+        } else {
+            $this->peopleCount -= $peopleCount;
+        }
+        $this->save();
+        MyDB::insert('unit_sale', [
+            'type' => 'pay',
+            'unitTo' => $this->id,
+            'valueFrom' => 0,
+            'valueTo' => (-1*$peoplePay*$peopleCount) * 2,
+            'amount' => $peopleCount,
+            'quality' => $peopleQuality,
+            'date' => timestamp_to_db()
+        ]);
+        $this->city->add_population($peopleType, $peopleCount, $peopleQuality);
         return true;
     }
 

@@ -44,51 +44,50 @@ if ($unit) {
             $unit->makeAccess = $access;
             $unit->save();
         break;
+        case 'add_people':
+            $peopleCount = intval($_REQUEST['count']);
+            if ($peopleCount < 1) break;
+            $peopleType = $_REQUEST['people_type'];
+            if ($peopleType != 'office') {
+                $peopleType = $unit->type->peopleType;
+            }
+            $peoplePay = floatval($_REQUEST['pay']);
+            $populationData = $unit->city->get_population_data($peopleType);
+            if ($populationData['amount'] < $peopleCount) {
+                $error = "В городе недостаточно свободных работников";
+                break;
+            }
+            if ($unit->company->money < $peoplePay*$peopleCount) {
+                $error = "У вашей компании недостаточно денег";
+                break;
+            }
+            if (!$unit->employ_people($peopleType, $peopleCount, $peoplePay)) {
+                $error = "Не удалось нанять работников";
+            }
+        break;
+        case 'remove_people':
+            $peopleCount = intval($_REQUEST['count']);
+            if ($peopleCount < 1) break;
+            $peopleType = $_REQUEST['people_type'];
+            if (!$unit->kick_people($peopleType, $peopleCount)) {
+                $error = "Не удалось уволить работников";
+            }
+        break;
     }
     if (!in_array($tab, UnitType::$_UNIT_TABS[$unit->type->type])) {
         $tab = 'info';
     }
 
     $data['unit'] = $unit->get_info(true);
-    if ($tab == 'supply') {
-        $transport = $unit->get_transport_to();
-    } elseif ($tab == 'sale') {
-        $transport = $unit->get_transport_from();
-    }
-
-    if ($tab == in_array($tab, ['supply', 'sale'])) {
-        $data['products'] = [];
-        $products = $unit->get_product_supply();
-        foreach ($products as $product) {
-            $data['products'][$product->type->id] = $product->get_info();
-            $data['products'][$product->type->id]['transport'] = [];
-        }
-        foreach ($transport as $item) {
-            $typeId = $item['typeId'];
-            $unitFrom = Unit::get($item['unitId']);
-            $item['unit'] = $unitFrom->get_info();
-            $item['company'] = $unitFrom->company->get_info();
-            $item['city'] = $unitFrom->city->get_info();
-            $item['time'] = strtotime($item['endTime']) - time();
-            if ($item['time'] < 1) {
-                $item['time'] = 1;
-            }
-            if (isset($data['products'][$typeId])) {
-                $data['products'][$typeId]['transport'][] = $item;
-            } else {
-                $data['products'][$typeId] = [
-                    'amount'    => 0,
-                    'quality'   => 0,
-                    'type'      => ProductType::get($item['typeId'])->get_info(),
-                    'transport' => [$item]
-                ];
-            }
-        }
-    }
+    $data['city'] = $unit->city->get_info();
 
     switch ($tab) {
         case 'info':
             $data['unit']['statistic'] = $unit->get_statistic();
+        break;
+        case 'people':
+            $data['unit']['peopleData'] = $unit->city->get_population_data($unit->type->peopleType);
+            $data['unit']['officeData'] = $unit->city->get_population_data('office');
         break;
         case 'storage':
             $products = $unit->get_products();
@@ -133,7 +132,22 @@ if ($unit) {
                 }
             }
         break;
+        case 'supply':
+            $data['products'] = [];
+            $products = $unit->get_product_supply();
+            foreach ($products as $product) {
+                $data['products'][$product->type->id] = $product->get_info();
+                $data['products'][$product->type->id]['transport'] = [];
+            }
+            $transport = $unit->get_transport_to();
+        break;
         case 'sale':
+            $data['products'] = [];
+            $products = $unit->get_product_sale();
+            foreach ($products as $product) {
+                $data['products'][$product->type->id] = $product->get_info();
+                $data['products'][$product->type->id]['transport'] = [];
+            }
             $sells = $unit->get_product_sells();
             foreach ($sells as $item) {
                 $typeId = $item['typeId'];
@@ -141,11 +155,14 @@ if ($unit) {
                     $data['products'][$typeId]['sell'] = $item;
                 }
             }
-            foreach ($data['products'] as $key => $product) {
-                if (!isset($product['sell'])) {
-                    $data['products'][$key]['sell'] = ['price' => 0, 'access' => 'close'];
+            if ($unit->type->type == 'shop') {
+                foreach ($data['products'] as $key => $product) {
+                    if (!isset($product['sell'])) {
+                        $data['products'][$key]['sell'] = ['price' => 0, 'access' => 'close'];
+                    }
                 }
             }
+            $transport = $unit->get_transport_from();
         break;
         case 'construction':
             $constructionPower = $unit->type->get_product_cost()[0];
@@ -176,6 +193,29 @@ if ($unit) {
             $data['construction']['amount'] = $material->amount;
             $data['construction']['queueAmount'] = $constructionQueueAmount;
         break;
+    }
+    if ($tab == 'supply' || $tab == 'sale') {
+        foreach ($transport as $item) {
+            $typeId = $item['typeId'];
+            $unitFrom = Unit::get($item['unitId']);
+            $item['unit'] = $unitFrom->get_info();
+            $item['company'] = $unitFrom->company->get_info();
+            $item['city'] = $unitFrom->city->get_info();
+            $item['time'] = strtotime($item['endTime']) - time();
+            if ($item['time'] < 1) {
+                $item['time'] = 1;
+            }
+            if (isset($data['products'][$typeId])) {
+                $data['products'][$typeId]['transport'][] = $item;
+            } else {
+                $data['products'][$typeId] = [
+                    'amount'    => 0,
+                    'quality'   => 0,
+                    'type'      => ProductType::get($item['typeId'])->get_info(),
+                    'transport' => [$item]
+                ];
+            }
+        }
     }
 } else {
     header("Location: /units");

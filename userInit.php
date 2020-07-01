@@ -24,11 +24,4 @@ if (!$openedCompany && count($companyList)) {
 }
 if (!$openedCompany) {
     $nextPage = 'create_company';
-} else {
-    $data['companyList'] = [];
-    foreach ($companyList as $company) {
-        $data['companyList'][] = $company->get_info(true);
-    }
-    $data['openedCompany'] = $openedCompany->get_info(true);
-    $data['possibleCountries'] = Country::get_list_info(['currencyId' => $openedCompany->currency->id]);
 }

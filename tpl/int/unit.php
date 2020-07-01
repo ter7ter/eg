@@ -2,14 +2,22 @@
     var unit_id = <?=$data['unit']['id']?>;
 </script>
 <div class="data-form" id="unit-form">
-    <h3><?=$data['unit']['title']?></h3>
+    <?if ($error):?>
+    <div class="msg-error"><?=$error?></div>
+    <?endif;?>
+    <h3><?=$data['city']['title']?>/<?=$data['unit']['title']?></h3>
     <div class="form-tabs">
         <?if (in_array('info', UnitType::$_UNIT_TABS[$data['unit']['type']['type']])):?>
         <div class="tab<?=($tab=='info')?' active':''?>">
-            <a href="/uni?&id=<?=$data['unit']['id']?>&tab=info">Информация</a>
+            <a href="/unit?&id=<?=$data['unit']['id']?>&tab=info">Информация</a>
         </div>
         <?endif;?>
     <?if ($data['unit']['status'] == 'work'):?>
+        <?if (in_array('people', UnitType::$_UNIT_TABS[$data['unit']['type']['type']])):?>
+            <div class="tab<?=($tab=='people')?' active':''?>">
+                <a href="/unit?&id=<?=$data['unit']['id']?>&tab=people">Персонал</a>
+            </div>
+        <?endif;?>
         <?if (in_array('supply', UnitType::$_UNIT_TABS[$data['unit']['type']['type']])):?>
         <div class="tab<?=($tab=='supply')?' active':''?>">
             <a href="/unit?id=<?=$data['unit']['id']?>&tab=supply">Снабжение</a>

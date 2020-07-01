@@ -99,4 +99,55 @@ class City extends Base {
         $query = "SELECT count(*) ".City::get_builder_query();
         return MyDB::query($query, ['city_id' => $this->id, 'company_id' => $company->id, 'cost' => $unitType->cost], 'elem');
     }
+
+    /**
+     * @param string $type
+     * @return array
+     * @throws Exception
+     */
+    public function get_population_data($type) {
+        return MyDB::query("SELECT amount, quality, pay, dispersionQuality, dispersionPay FROM population 
+            WHERE cityId = ?city_id AND type = '?type'", ['city_id' => $this->id, 'type' => $type], 'row');
+    }
+
+    /**
+     * @param string $peopleType
+     * @param float $pay
+     * @return bool|float
+     * @throws Exception
+     */
+    public function calculate_people_quality($peopleType, $pay) {
+        $populationData = $this->get_population_data($peopleType);
+        if ($pay < $populationData['pay'] / $populationData['dispersionPay'])  {
+            return false;
+        }
+        $payFactor =  $pay / $populationData['pay'];
+        if ($payFactor > $populationData['dispersionPay']) {
+            $payFactor = $populationData['dispersionPay'];
+        }
+        $payFactor = ($payFactor-1)/($populationData['dispersionPay'] - 1);
+        $peopleQuality = $populationData['quality']*($payFactor * ($populationData['dispersionQuality']-1) + 1);
+        return $peopleQuality;
+    }
+
+    public function update_population($peopleType, $peopleCount, $peopleQuality) {
+        MyDB::query("UPDATE population SET amount = ?amount, quality = '?quality' WHERE cityId = ?city_id AND type = '?type'",
+            ['amount' => $peopleCount, 'quality' => $peopleQuality, 'city_id' => $this->id, 'type' => $peopleType]);
+    }
+
+    /**
+     * Добавить к свободной рабочей силе города
+     * @param string $peopleType
+     * @param int $peopleCount
+     * @param float $peopleQuality
+     * @throws Exception
+     */
+    public function add_population($peopleType, $peopleCount, $peopleQuality) {
+        $populationData = $this->get_population_data($peopleType);
+        $sumQuality = $populationData['amount']*$populationData['quality'];
+        $sumQuality += $peopleCount*$peopleQuality;
+        $populationData['amount'] += $peopleCount;
+        $populationData['quality'] = $sumQuality / $populationData['amount'];
+        $this->update_population($peopleType, $populationData['amount'], $populationData['quality']);
+    }
 }

@@ -16,7 +16,7 @@
             <td><?=$make['eff']?></td>
             <td>
                 <?if ($make['amount'] >= 1):?>
-                <input class="select-supply-count" type="number" value="0" min="0" max="<?=$make['amount']?>">
+                <input class="select-supply-count" type="number" value="0" min="0" max="<?=$make['product']['amount']?>">
                 <a class="do-unload" data-type-id="<?=$make['product']['type']['id']?>" href="#this">Выгрузить</a>
                 <?endif;?>
             </td>
@@ -41,7 +41,7 @@
             <td><?=$cost['product']['quality']?></td>
             <td>
                 <?if ($cost['amount'] >= 1):?>
-                <input class="select-supply-count" type="number" value="0" min="0" max="<?=$cost['amount']?>">
+                <input class="select-supply-count" type="number" value="0" min="0" max="<?=$cost['product']['amount']?>">
                 <a class="do-unload" data-type-id="<?=$cost['product']['type']['id']?>" href="#this">Выгрузить</a>
                 <?endif;?>
             </td>

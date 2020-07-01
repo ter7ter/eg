@@ -32,7 +32,7 @@ define("PICTURES_SEVAPATH", $_SERVER['DOCUMENT_ROOT'].'/pictures/');
 /**
  * В течении скольких секунд после последнего посещения считаем пользователя онлайн
  */
-define('USER_ONLINE_TIME', 15*60);
+define('USER_ONLINE_TIME', 1500*60);
 //Через сколько секунд неактивности разлогиниваем пользователя
 define('USER_LOGOUT', 30*60);
 
